@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3934 · Varguitas — Rosa</title>
+<style>
+:root {
+  --bg:#fafaf8;--surface:#ffffff;--surface2:#f4f3ef;--border:#e2e1da;--border2:#d0cfc8;
+  --text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;
+  --green:#1D9E75;--green-bg:#e1f5ee;
+  --amber:#BA7517;--amber-bg:#faeeda;--amber-text:#633806;
+  --red-bg:#fcebeb;--red-text:#791f1f;
+  --success:#1a7a4a;--success-bg:#e1f5ee;
+  --mono:'Courier New',Courier,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#161614;--surface:#1e1e1c;--surface2:#252522;--border:#2e2e2a;--border2:#3a3a36;
+    --text:#f0efe8;--text2:#9a9a92;--text3:#5a5a54;
+    --green-bg:#04342c;--amber-bg:#412402;--amber-text:#fac775;
+    --red-bg:#501313;--red-text:#f7c1c1;--success-bg:#04342c;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;}
+body{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+
+.login-wrap{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center;}
+.login-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);}
+.login-title{font-size:26px;font-weight:600;letter-spacing:-.02em;}
+.login-sub{font-size:13px;color:var(--text2);max-width:340px;line-height:1.6;}
+.login-btn{display:flex;align-items:center;gap:10px;padding:10px 20px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.login-btn:hover{background:var(--surface2);}
+.login-btn svg{width:18px;height:18px;flex-shrink:0;}
+
+.masthead{border-bottom:1px solid var(--border);padding-bottom:1.25rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;}
+.masthead-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:3px;}
+.masthead-title{font-size:22px;font-weight:600;letter-spacing:-.02em;}
+.masthead-right{font-size:12px;color:var(--text3);font-family:var(--mono);text-align:right;}
+.user-badge{font-size:11px;color:var(--green);margin-top:2px;}
+
+.loading-bar{height:2px;background:var(--green);border-radius:1px;margin-bottom:1.25rem;animation:shimmer 1.2s infinite;}
+@keyframes shimmer{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+
+.month-nav{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;}
+.nav-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-size:13px;}
+.nav-btn:hover{border-color:var(--border2);color:var(--text);}
+.month-label{font-size:18px;font-weight:600;min-width:160px;font-family:var(--mono);}
+.month-total{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--amber);margin-left:auto;}
+
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.5rem;}
+.scard{background:var(--surface2);border-radius:8px;padding:12px 14px;}
+.scard-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;font-family:var(--mono);}
+.scard-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle;}
+.scard-value{font-size:18px;font-weight:600;font-family:var(--mono);}
+.scard-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.scard-status{font-size:11px;margin-top:4px;padding:2px 7px;border-radius:10px;display:inline-block;}
+.status-paid{background:var(--success-bg);color:var(--success);}
+.status-pending{background:var(--amber-bg);color:var(--amber-text);}
+.status-nodata{background:var(--surface);color:var(--text3);border:1px solid var(--border);}
+
+.unit{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.unit-head{padding:13px 16px 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.unit-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.unit-name{font-size:15px;font-weight:600;}
+.unit-dept{font-size:11px;color:var(--text3);font-family:var(--mono);margin-left:2px;}
+.unit-renta{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text2);}
+.saving-badge{font-size:10px;color:var(--text3);font-family:var(--mono);animation:shimmer 1s infinite;}
+
+.unit-body{padding:0 16px 14px;}
+.field-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.field-label{font-size:12px;color:var(--text3);width:72px;flex-shrink:0;}
+.reading-group{display:flex;align-items:center;gap:5px;}
+.arrow{color:var(--text3);font-size:12px;}
+.field-input{height:30px;width:90px;padding:0 7px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:12px;text-align:right;outline:none;}
+.field-input:focus{border-color:var(--border2);}
+.fixed-val{font-family:var(--mono);font-size:12px;color:var(--text2);padding:0 4px;}
+.calc-result{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text2);margin-left:6px;}
+
+.unit-divider{border:none;border-top:1px solid var(--border);margin:10px 0;}
+.total-row{display:flex;align-items:center;justify-content:space-between;}
+.total-amount{font-family:var(--mono);font-size:18px;font-weight:600;}
+.total-actions{display:flex;gap:8px;align-items:center;}
+.btn{height:30px;padding:0 12px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12px;color:var(--text2);}
+.btn:hover{background:var(--surface2);color:var(--text);}
+.btn-paid{background:var(--success-bg)!important;color:var(--success)!important;border-color:transparent!important;}
+.btn-pending{background:var(--amber-bg)!important;color:var(--amber-text)!important;border-color:transparent!important;}
+.btn-copied{background:var(--success-bg)!important;color:var(--success)!important;border-color:transparent!important;}
+.toggle-msg{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:4px 0 0;display:block;}
+.toggle-msg:hover{color:var(--text2);}
+.msg-preview{display:none;margin-top:10px;background:var(--surface2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.7;font-family:var(--mono);}
+.msg-preview.open{display:block;}
+.no-data-msg{padding:12px 0 4px;font-size:13px;color:var(--text3);}
+
+.notice{margin-top:2rem;padding:12px 16px;background:var(--amber-bg);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.7;}
+.notice strong{color:var(--text);}
+.error-bar{display:none;margin-bottom:1rem;padding:10px 14px;background:var(--red-bg);color:var(--red-text);border-radius:8px;font-size:13px;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div>
+      <div class="login-label">3934 family office · varguitas</div>
+      <div class="login-title" style="margin-top:6px;">Rosa — Alquileres</div>
+    </div>
+    <p class="login-sub">Conecta tu cuenta de Chakakuna para acceder a los datos de las cuatro unidades.</p>
+    <button class="login-btn" onclick="signIn()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Conectar con Google
+    </button>
+  </div>
+</div>
+
+<div id="appContainer" style="display:none;">
+  <div class="masthead">
+    <div>
+      <div class="masthead-label">3934 family office · varguitas</div>
+      <div class="masthead-title">Rosa — Alquileres</div>
+    </div>
+    <div class="masthead-right">
+      301 · 302 · 401 · 402<br>
+      <span class="user-badge" id="userBadge"></span>
+    </div>
+  </div>
+
+  <div id="loadingBar" class="loading-bar" style="display:none;"></div>
+  <div id="errorMsg" class="error-bar"></div>
+
+  <div class="month-nav">
+    <button class="nav-btn" onclick="navigate(-1)">← ant.</button>
+    <span class="month-label" id="monthLabel">—</span>
+    <button class="nav-btn" onclick="navigate(1)">sig. →</button>
+    <span class="month-total" id="grandTotal"></span>
+  </div>
+
+  <div class="summary-grid" id="summaryGrid"></div>
+  <div id="unitsContainer"></div>
+
+  <div class="notice">
+    <strong>Impuesto 1ra categoría:</strong> Renta neta mensual S/ 3,350 (suma de las 4 rentas) → pago a cuenta 5% = <strong>S/ 167.50/mes</strong>. Declara y paga a SUNAT el mes siguiente del cobro. Agua, limpieza y luz son traslado al inquilino — no son ingreso tuyo.
+  </div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+const CLIENT_ID = '779240650302-q68dttktik0dsp08smf8j365gu3gkb3g.apps.googleusercontent.com';
+const SCOPES    = 'https://www.googleapis.com/auth/spreadsheets';
+
+const UNITS = [
+  { id:'rosa301', name:'Rosa 301', sheetId:'1CkXQ-aE0OPgS_1AJCB6ivYAz-UwbmQjpJDgv8faHgH8', sheetName:'Rosa 301', renta:600,  dueDay:18, color:'#1D9E75' },
+  { id:'rosa302', name:'Rosa 302', sheetId:'1Acxtm25GGH8ra2N7tO8K1zAoWeysIXvKcgGgHXOhHFs', sheetName:'Rosa 302', renta:850,  dueDay:18, color:'#378ADD' },
+  { id:'rosa401', name:'Rosa 401', sheetId:'1QhwFLMz81wbQW1brF4OMjn0CWohE_dNAUFKLngLh3aM', sheetName:'Rosa 401', renta:800,  dueDay:18, color:'#BA7517' },
+  { id:'rosa402', name:'Rosa 402', sheetId:'1KP39A2iLi48WfIkbr5t8W2pJog35f7mPD_j7iUGymj0', sheetName:'Rosa 402', renta:900,  dueDay:18, color:'#D4537E' },
+];
+
+// Column indices (0-based)
+// A:mes_key B:mes_nombre C:fecha_venc D:renta E:agua_fija F:limpieza
+// G:luz_prev H:luz_cur I:luz_consumo J:luz_tasa K:luz_costo L:total M:pagado
+const C = { mes_key:0, renta:3, agua_fija:4, limpieza:5, luz_prev:6, luz_cur:7, luz_tasa:9, luz_costo:10, total:11, pagado:12 };
+const FIELD_COL = { renta:'D', agua_fija:'E', limpieza:'F', luz_prev:'G', luz_cur:'H', luz_tasa:'J', pagado:'M' };
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Setiembre','Octubre','Noviembre','Diciembre'];
+
+let accessToken  = null;
+let tokenClient  = null;
+let unitData     = {};
+let curYear      = new Date().getFullYear();
+let curMonth     = new Date().getMonth();
+let openMessages = new Set();
+let saving       = {};
+let debouncers   = {};
+
+function mkey(y, m) { return `${y}-${String(m+1).padStart(2,'0')}`; }
+function prevMkey(y, m) { let pm=m-1,py=y; if(pm<0){pm=11;py--;} return mkey(py,pm); }
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+
+window.onload = () => {
+  const iv = setInterval(() => {
+    if (window.google?.accounts?.oauth2) {
+      clearInterval(iv);
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID, scope: SCOPES, callback: onToken,
+      });
+    }
+  }, 100);
+};
+
+function signIn() {
+  if (!tokenClient) { showError('Google aún no cargó.'); return; }
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+function onToken(resp) {
+  if (resp.error) { showError('Error: ' + resp.error); return; }
+  accessToken = resp.access_token;
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } })
+    .then(r => r.json()).then(info => {
+      const b = document.getElementById('userBadge');
+      if (b) b.textContent = '● ' + (info.email || 'conectado');
+    }).catch(() => {});
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  loadAllUnits();
+}
+
+// ── SHEETS API ────────────────────────────────────────────────────────────────
+
+async function sheetsGet(id, range) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}?valueRenderOption=UNFORMATTED_VALUE`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 401) { signIn(); throw new Error('Sesión expirada.'); }
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  return res.json();
+}
+
+async function sheetsSet(id, range, value) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [[value]] })
+  });
+  if (res.status === 401) { signIn(); throw new Error('Sesión expirada.'); }
+  if (!res.ok) throw new Error(`Write error ${res.status}`);
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+
+async function loadAllUnits() {
+  showLoading(true);
+  try {
+    await Promise.all(UNITS.map(u => loadUnit(u)));
+    render();
+  } catch(e) { showError(e.message); }
+  showLoading(false);
+}
+
+async function loadUnit(u) {
+  try {
+    const resp = await sheetsGet(u.sheetId, `'${u.sheetName}'!A1:M200`);
+    const rows = resp.values || [];
+    const key  = mkey(curYear, curMonth);
+    const pkey = prevMkey(curYear, curMonth);
+    let rowIdx = -1, prevRowIdx = -1;
+    for (let i = 1; i < rows.length; i++) {
+      const k = (rows[i][0] || '').trim();
+      if (k === key)  rowIdx = i;
+      if (k === pkey) prevRowIdx = i;
+    }
+    if (rowIdx === -1) { unitData[u.id] = null; return; }
+    const row = rows[rowIdx];
+    const n = (i) => parseFloat(row[i]) || 0;
+
+    let luz_prev = n(C.luz_prev);
+
+    // Auto-propagate: if luz_prev empty, pull from previous month's luz_cur
+    if (luz_prev === 0 && prevRowIdx !== -1) {
+      const prev_luz_cur = parseFloat(rows[prevRowIdx][C.luz_cur]) || 0;
+      if (prev_luz_cur > 0) {
+        luz_prev = prev_luz_cur;
+        sheetsSet(u.sheetId, `'${u.sheetName}'!G${rowIdx + 1}`, luz_prev);
+      }
+    }
+
+    unitData[u.id] = {
+      rowIndex: rowIdx + 1,
+      data: {
+        renta:     n(C.renta),
+        agua_fija: n(C.agua_fija),
+        limpieza:  n(C.limpieza),
+        luz_prev,
+        luz_cur:   n(C.luz_cur),
+        luz_tasa:  n(C.luz_tasa) || 0.95,
+        pagado:    (row[C.pagado] || '').toString().toUpperCase() === 'TRUE',
+      }
+    };
+  } catch(e) { unitData[u.id] = null; throw e; }
+}
+
+// ── WRITE ─────────────────────────────────────────────────────────────────────
+
+function debouncedWrite(unitId, field, rawValue, delay=800) {
+  clearTimeout(debouncers[`${unitId}-${field}`]);
+  const ud = unitData[unitId];
+  if (ud?.data) { ud.data[field] = parseFloat(rawValue) || 0; updateCalcDisplay(unitId); }
+  debouncers[`${unitId}-${field}`] = setTimeout(() => persistField(unitId, field, parseFloat(rawValue) || 0), delay);
+}
+
+async function persistField(unitId, field, value) {
+  const u  = UNITS.find(x => x.id === unitId);
+  const ud = unitData[unitId];
+  if (!ud?.rowIndex) return;
+  const col = FIELD_COL[field];
+  if (!col) return;
+  saving[unitId] = (saving[unitId] || 0) + 1;
+  renderSavingBadge(unitId);
+  try {
+    await sheetsSet(u.sheetId, `'${u.sheetName}'!${col}${ud.rowIndex}`, value);
+  } catch(e) { showError(`No se pudo guardar ${u.name}: ${e.message}`); }
+  saving[unitId] = Math.max(0, (saving[unitId] || 1) - 1);
+  renderSavingBadge(unitId);
+}
+
+function togglePaid(unitId) {
+  const ud = unitData[unitId];
+  if (!ud?.data) return;
+  ud.data.pagado = !ud.data.pagado;
+  const btn = document.querySelector(`#unit-${unitId} .paid-btn`);
+  if (btn) { btn.textContent = ud.data.pagado ? '✓ cobrado' : 'pendiente'; btn.className = `btn paid-btn ${ud.data.pagado ? 'btn-paid' : 'btn-pending'}`; }
+  const sc = document.querySelector(`#scard-${unitId} .scard-status`);
+  if (sc) { sc.textContent = ud.data.pagado ? 'cobrado' : 'pendiente'; sc.className = `scard-status ${ud.data.pagado ? 'status-paid' : 'status-pending'}`; }
+  persistField(unitId, 'pagado', ud.data.pagado);
+}
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+
+function calcUnit(d) {
+  if (!d) return { luzConsumo:0, luzCost:0, total:0 };
+  const lc    = Math.max(0,(d.luz_cur||0)-(d.luz_prev||0));
+  const lCost = +((lc*(d.luz_tasa||0.95)).toFixed(2));
+  return { luzConsumo:lc, luzCost:lCost,
+           total:+(((d.renta||0)+(d.agua_fija||0)+(d.limpieza||0)+lCost).toFixed(2)) };
+}
+
+function updateCalcDisplay(unitId) {
+  const ud = unitData[unitId];
+  if (!ud?.data) return;
+  const calc = calcUnit(ud.data);
+  const ul = document.querySelector(`#unit-${unitId} .calc-luz`);
+  const ut = document.querySelector(`#unit-${unitId} .total-amount`);
+  if (ul) ul.textContent = calc.luzCost > 0 ? fmt(calc.luzCost)+` (${calc.luzConsumo} kWh)` : '—';
+  if (ut) ut.textContent = fmt(calc.total);
+  let grand = 0;
+  for (const u of UNITS) { const d = unitData[u.id]?.data; if(d) grand += calcUnit(d).total; }
+  const gt = document.getElementById('grandTotal');
+  if (gt) gt.textContent = grand > 0 ? `Total: ${fmt(grand)}` : '';
+}
+
+function renderSavingBadge(unitId) {
+  const b = document.querySelector(`#unit-${unitId} .saving-badge`);
+  if (b) b.style.display = (saving[unitId] || 0) > 0 ? 'inline' : 'none';
+}
+
+// ── WHATSAPP ──────────────────────────────────────────────────────────────────
+
+function whatsappMsg(u, d, calc) {
+  const mes = MONTHS_ES[curMonth].toLowerCase();
+  return `Hola, la cuenta de ${mes} es *S/ ${calc.total.toFixed(2)}*.\n\nEste monto es la suma de:\n🏠 *Renta:* S/ ${(d.renta||0).toFixed(2)}\n💧 *Agua:* S/ ${(d.agua_fija||0).toFixed(2)}\n🧹 *Limpieza:* S/ ${(d.limpieza||0).toFixed(2)}\n💡 *Luz:* S/ ${calc.luzCost.toFixed(2)}\n\nMe envías el voucher, por favor.`;
+}
+
+async function copyMsg(unitId) {
+  const u  = UNITS.find(x => x.id === unitId);
+  const ud = unitData[unitId];
+  if (!ud?.data) return;
+  const calc = calcUnit(ud.data);
+  try {
+    await navigator.clipboard.writeText(whatsappMsg(u, ud.data, calc));
+    const btn = document.getElementById(`copy-${unitId}`);
+    if (btn) { btn.textContent='✓ copiado'; btn.classList.add('btn-copied'); setTimeout(()=>{btn.textContent='copiar msg';btn.classList.remove('btn-copied');},2000); }
+  } catch(e) { showError('No se pudo copiar.'); }
+}
+
+function toggleMsg(unitId) {
+  if (openMessages.has(unitId)) openMessages.delete(unitId); else openMessages.add(unitId);
+  const el = document.getElementById(`msg-${unitId}`);
+  const btn = document.querySelector(`#unit-${unitId} .toggle-msg`);
+  if (el) el.classList.toggle('open', openMessages.has(unitId));
+  if (btn) btn.textContent = openMessages.has(unitId) ? '▲ ocultar mensaje' : '▼ ver mensaje';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+
+function fmt(n) { return 'S/ '+Number(n).toFixed(2); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function render() {
+  document.getElementById('monthLabel').textContent = `${MONTHS_ES[curMonth]} ${curYear}`;
+  let grand = 0, summaryHTML = '', unitsHTML = '';
+
+  for (const u of UNITS) {
+    const ud   = unitData[u.id];
+    const d    = ud?.data;
+    const calc = calcUnit(d);
+    if (d) grand += calc.total;
+
+    const sc = d?.pagado ? 'status-paid' : 'status-pending';
+    const st = d?.pagado ? 'cobrado' : 'pendiente';
+
+    summaryHTML += `
+      <div class="scard" id="scard-${u.id}">
+        <div class="scard-label"><span class="scard-dot" style="background:${u.color}"></span>${u.name}</div>
+        <div class="scard-value">${!d ? '—' : fmt(calc.total)}</div>
+        <div class="scard-sub">renta S/ ${u.renta} · día ${u.dueDay}</div>
+        ${!d ? '<span class="scard-status status-nodata">sin datos</span>' : `<span class="scard-status ${sc}">${st}</span>`}
+      </div>`;
+
+    const msgOpen = openMessages.has(u.id);
+    const msg = d ? whatsappMsg(u, d, calc) : '';
+
+    unitsHTML += `
+      <div class="unit" id="unit-${u.id}">
+        <div class="unit-head">
+          <div class="unit-dot" style="background:${u.color}"></div>
+          <span class="unit-name">${u.name}</span>
+          <span class="unit-renta">S/ ${u.renta} · vence día ${u.dueDay}</span>
+          <span class="saving-badge" style="display:none">guardando…</span>
+        </div>
+        ${!d
+          ? `<div class="unit-body"><p class="no-data-msg">Sin datos para ${MONTHS_ES[curMonth]} ${curYear}.</p></div>`
+          : `<div class="unit-body">
+              <div class="field-row">
+                <span class="field-label">🏠 Renta</span>
+                <span class="fixed-val">${fmt(d.renta)}</span>
+              </div>
+              <div class="field-row">
+                <span class="field-label">💧 Agua</span>
+                <span class="fixed-val">${fmt(d.agua_fija)}</span>
+                <span style="font-size:11px;color:var(--text3);margin-left:4px;">fija</span>
+              </div>
+              <div class="field-row">
+                <span class="field-label">🧹 Limpieza</span>
+                <span class="fixed-val">${fmt(d.limpieza)}</span>
+                <span style="font-size:11px;color:var(--text3);margin-left:4px;">fija</span>
+              </div>
+              <div class="field-row">
+                <span class="field-label">💡 Luz</span>
+                <div class="reading-group">
+                  <input class="field-input" type="number" step="1" min="0"
+                    value="${d.luz_prev||''}" placeholder="ant."
+                    onchange="debouncedWrite('${u.id}','luz_prev',this.value)">
+                  <span class="arrow">→</span>
+                  <input class="field-input" type="number" step="1" min="0"
+                    value="${d.luz_cur||''}" placeholder="act."
+                    onchange="debouncedWrite('${u.id}','luz_cur',this.value)">
+                </div>
+                <span class="calc-result calc-luz">${calc.luzCost>0?fmt(calc.luzCost)+` (${calc.luzConsumo} kWh)`:'—'}</span>
+              </div>
+              <hr class="unit-divider">
+              <div class="total-row">
+                <span class="total-amount">${fmt(calc.total)}</span>
+                <div class="total-actions">
+                  <button class="btn paid-btn ${d.pagado?'btn-paid':'btn-pending'}" onclick="togglePaid('${u.id}')">
+                    ${d.pagado?'✓ cobrado':'pendiente'}
+                  </button>
+                  <button class="btn" id="copy-${u.id}" onclick="copyMsg('${u.id}')">copiar msg</button>
+                </div>
+              </div>
+              <button class="toggle-msg" onclick="toggleMsg('${u.id}')">${msgOpen?'▲ ocultar mensaje':'▼ ver mensaje'}</button>
+              <div class="msg-preview ${msgOpen?'open':''}" id="msg-${u.id}">${esc(msg).replace(/\n/g,'<br>')}</div>
+            </div>`}
+      </div>`;
+  }
+
+  document.getElementById('grandTotal').textContent   = grand > 0 ? `Total: ${fmt(grand)}` : '';
+  document.getElementById('summaryGrid').innerHTML    = summaryHTML;
+  document.getElementById('unitsContainer').innerHTML = unitsHTML;
+}
+
+function navigate(dir) {
+  curMonth += dir;
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  if (curMonth < 0)  { curMonth = 11; curYear--; }
+  unitData = {};
+  render();
+  loadAllUnits();
+}
+
+function showLoading(on) { document.getElementById('loadingBar').style.display = on ? 'block' : 'none'; }
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+</script>
+</body>
+</html>

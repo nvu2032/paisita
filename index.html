@@ -29,7 +29,6 @@
 html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;}
 body{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 
-/* Login */
 .login-wrap{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center;}
 .login-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);}
 .login-title{font-size:26px;font-weight:600;letter-spacing:-.02em;}
@@ -37,16 +36,17 @@ body{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .login-btn{display:flex;align-items:center;gap:10px;padding:10px 20px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
 .login-btn:hover{background:var(--surface2);border-color:var(--text3);}
 .login-btn svg{width:18px;height:18px;flex-shrink:0;}
+.server-note{margin-top:1rem;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text3);font-family:var(--mono);line-height:1.8;}
+.server-note strong{color:var(--text2);}
 
-/* App */
 .masthead{border-bottom:1px solid var(--border);padding-bottom:1.25rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;}
 .masthead-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:3px;}
 .masthead-title{font-size:22px;font-weight:600;letter-spacing:-.02em;}
 .masthead-right{font-size:12px;color:var(--text3);font-family:var(--mono);text-align:right;}
 .user-badge{font-size:11px;color:var(--green);margin-top:2px;}
 
-.loading-bar{height:2px;background:linear-gradient(90deg,var(--green),transparent);border-radius:1px;margin-bottom:1.25rem;animation:shimmer 1.2s infinite;}
-@keyframes shimmer{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+.loading-bar{height:2px;background:var(--green);border-radius:1px;margin-bottom:1.25rem;animation:shimmer 1.2s infinite;}
+@keyframes shimmer{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
 
 .month-nav{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;}
 .nav-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;color:var(--text2);font-size:13px;}
@@ -90,7 +90,6 @@ body{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .btn:hover{background:var(--surface2);color:var(--text);}
 .btn-paid{background:var(--success-bg)!important;color:var(--success)!important;border-color:transparent!important;}
 .btn-pending{background:var(--amber-bg)!important;color:var(--amber-text)!important;border-color:transparent!important;}
-.btn-copy:hover{border-color:var(--border2);color:var(--text);}
 .btn-copied{background:var(--success-bg)!important;color:var(--success)!important;border-color:transparent!important;}
 .toggle-msg{background:none;border:none;font-size:11px;color:var(--text3);cursor:pointer;padding:4px 0 0;display:block;}
 .toggle-msg:hover{color:var(--text2);}
@@ -101,15 +100,10 @@ body{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 .notice{margin-top:2rem;padding:12px 16px;background:var(--amber-bg);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.7;}
 .notice strong{color:var(--text);}
 .error-bar{display:none;margin-bottom:1rem;padding:10px 14px;background:var(--red-bg);color:var(--red-text);border-radius:8px;font-size:13px;}
-
-/* Server instructions */
-.server-note{margin-top:1rem;padding:10px 14px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text3);font-family:var(--mono);line-height:1.8;}
-.server-note strong{color:var(--text2);}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-wrap">
     <div>
@@ -127,15 +121,13 @@ body{max-width:800px;margin:0 auto;padding:2rem 1.5rem 4rem;}
       Conectar con Google
     </button>
     <div class="server-note">
-      <strong>Para abrir este archivo localmente:</strong><br>
-      1. Abre Terminal en la carpeta donde está este archivo<br>
-      2. Ejecuta: <code>python3 -m http.server 8080</code><br>
-      3. Abre: <code>http://localhost:8080/varguitas_larco.html</code>
+      <strong>Para abrir localmente:</strong><br>
+      cd 3934-varguitas → python3 -m http.server 8080<br>
+      → http://localhost:8080/varguitas_larco.html
     </div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="appContainer" style="display:none;">
   <div class="masthead">
     <div>
@@ -177,7 +169,6 @@ const UNITS = [
   { id:'larco202', name:'Larco 202', sheetId:'1kqQxk-7YZ27Xna_Mt9Bxx0J_xtWRlwAwKdzLtTRKAps', sheetName:'Larco 202', dept:'Dept 202', renta:800,  dueDay:18, color:'#D4537E' },
 ];
 
-// Column indices (0-based) matching sheet structure
 const C = {
   mes_key:0, mes_nombre:1, fecha_venc:2, renta:3,
   agua_prev:4, agua_cur:5, agua_consumo:6, agua_tasa:7, agua_costo:8,
@@ -189,7 +180,7 @@ const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Ago
 
 let accessToken  = null;
 let tokenClient  = null;
-let unitData     = {};   // { unitId: { rowIndex, data } | null }
+let unitData     = {};
 let curYear      = new Date().getFullYear();
 let curMonth     = new Date().getMonth();
 let openMessages = new Set();
@@ -197,6 +188,12 @@ let saving       = {};
 let debouncers   = {};
 
 function mkey(y, m) { return `${y}-${String(m+1).padStart(2,'0')}`; }
+
+function prevMkey(y, m) {
+  let pm = m - 1, py = y;
+  if (pm < 0) { pm = 11; py--; }
+  return mkey(py, pm);
+}
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 
@@ -214,14 +211,13 @@ window.onload = () => {
 };
 
 function signIn() {
-  if (!tokenClient) { showError('Google aún no cargó, intenta de nuevo en un segundo.'); return; }
+  if (!tokenClient) { showError('Google aún no cargó, intenta en un segundo.'); return; }
   tokenClient.requestAccessToken({ prompt: '' });
 }
 
 function onToken(resp) {
   if (resp.error) { showError('Error de autenticación: ' + resp.error); return; }
   accessToken = resp.access_token;
-  // Get user info to display badge
   fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
     headers: { Authorization: `Bearer ${accessToken}` }
   }).then(r => r.json()).then(info => {
@@ -238,8 +234,8 @@ function onToken(resp) {
 async function sheetsGet(spreadsheetId, range) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?valueRenderOption=UNFORMATTED_VALUE`;
   const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  if (res.status === 401) { signIn(); throw new Error('Sesión expirada — por favor reconecta.'); }
-  if (!res.ok) { const txt = await res.text(); throw new Error(`API error ${res.status}: ${txt}`); }
+  if (res.status === 401) { signIn(); throw new Error('Sesión expirada.'); }
+  if (!res.ok) throw new Error(`API error ${res.status}`);
   return res.json();
 }
 
@@ -251,7 +247,7 @@ async function sheetsSet(spreadsheetId, range, value) {
     body: JSON.stringify({ values: [[value]] })
   });
   if (res.status === 401) { signIn(); throw new Error('Sesión expirada.'); }
-  if (!res.ok) { const txt = await res.text(); throw new Error(`Write error ${res.status}: ${txt}`); }
+  if (!res.ok) throw new Error(`Write error ${res.status}`);
   return res.json();
 }
 
@@ -273,21 +269,51 @@ async function loadUnit(u) {
     const resp = await sheetsGet(u.sheetId, `'${u.sheetName}'!A1:P200`);
     const rows = resp.values || [];
     const key  = mkey(curYear, curMonth);
-    let rowIdx = -1;
+    const pkey = prevMkey(curYear, curMonth);
+
+    // Find current and previous month rows
+    let rowIdx = -1, prevRowIdx = -1;
     for (let i = 1; i < rows.length; i++) {
-      if ((rows[i][0] || '').trim() === key) { rowIdx = i; break; }
+      const k = (rows[i][0] || '').trim();
+      if (k === key)  rowIdx = i;
+      if (k === pkey) prevRowIdx = i;
     }
+
     if (rowIdx === -1) { unitData[u.id] = null; return; }
+
     const row = rows[rowIdx];
-    const n = (i) => parseFloat(row[i]) || 0;
+    const n   = (i) => parseFloat(row[i]) || 0;
+
+    let agua_prev = n(C.agua_prev);
+    let luz_prev  = n(C.luz_prev);
+
+    // ── AUTO-PROPAGATE FIX ────────────────────────────────────────────────────
+    // If prev readings are empty, pull from previous month's actuals
+    if (agua_prev === 0 && prevRowIdx !== -1) {
+      const prevRow  = rows[prevRowIdx];
+      const prev_agua_cur = parseFloat(prevRow[C.agua_cur]) || 0;
+      const prev_luz_cur  = parseFloat(prevRow[C.luz_cur])  || 0;
+
+      if (prev_agua_cur > 0) {
+        agua_prev = prev_agua_cur;
+        // Write back to Sheet so it persists
+        sheetsSet(u.sheetId, `'${u.sheetName}'!E${rowIdx + 1}`, agua_prev);
+      }
+      if (prev_luz_cur > 0) {
+        luz_prev = prev_luz_cur;
+        sheetsSet(u.sheetId, `'${u.sheetName}'!J${rowIdx + 1}`, luz_prev);
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     unitData[u.id] = {
-      rowIndex: rowIdx + 1, // 1-based for API
+      rowIndex: rowIdx + 1,
       data: {
         renta:     n(C.renta),
-        agua_prev: n(C.agua_prev),
+        agua_prev,
         agua_cur:  n(C.agua_cur),
         agua_tasa: n(C.agua_tasa) || 6.4,
-        luz_prev:  n(C.luz_prev),
+        luz_prev,
         luz_cur:   n(C.luz_cur),
         luz_tasa:  n(C.luz_tasa) || 0.95,
         pagado:    (row[C.pagado] || '').toString().toUpperCase() === 'TRUE',
@@ -304,7 +330,6 @@ async function loadUnit(u) {
 function debouncedWrite(unitId, field, rawValue, delay=800) {
   const key = `${unitId}-${field}`;
   clearTimeout(debouncers[key]);
-  // Update local data immediately for live calc
   const ud = unitData[unitId];
   if (ud?.data) {
     ud.data[field] = parseFloat(rawValue) || 0;
@@ -334,7 +359,6 @@ function togglePaid(unitId) {
   const ud = unitData[unitId];
   if (!ud?.data) return;
   ud.data.pagado = !ud.data.pagado;
-  // Update button immediately
   const btn = document.querySelector(`#unit-${unitId} .paid-btn`);
   if (btn) {
     btn.textContent = ud.data.pagado ? '✓ cobrado' : 'pendiente';
@@ -352,15 +376,12 @@ function togglePaid(unitId) {
 
 function calcUnit(d) {
   if (!d) return { aguaConsumo:0, aguaCost:0, luzConsumo:0, luzCost:0, total:0 };
-  const ac = Math.max(0,(d.agua_cur||0)-(d.agua_prev||0));
+  const ac    = Math.max(0,(d.agua_cur||0)-(d.agua_prev||0));
   const aCost = +((ac*(d.agua_tasa||6.4)).toFixed(2));
-  const lc = Math.max(0,(d.luz_cur||0)-(d.luz_prev||0));
+  const lc    = Math.max(0,(d.luz_cur||0)-(d.luz_prev||0));
   const lCost = +((lc*(d.luz_tasa||0.95)).toFixed(2));
-  return {
-    aguaConsumo:ac, aguaCost:aCost,
-    luzConsumo:lc,  luzCost:lCost,
-    total:+((( d.renta||0)+aCost+lCost).toFixed(2))
-  };
+  return { aguaConsumo:ac, aguaCost:aCost, luzConsumo:lc, luzCost:lCost,
+           total:+(((d.renta||0)+aCost+lCost).toFixed(2)) };
 }
 
 function updateCalcDisplay(unitId) {
@@ -373,7 +394,6 @@ function updateCalcDisplay(unitId) {
   if (ua) ua.textContent = calc.aguaCost > 0 ? fmt(calc.aguaCost)+` (${calc.aguaConsumo} m³)` : '—';
   if (ul) ul.textContent = calc.luzCost  > 0 ? fmt(calc.luzCost) +` (${calc.luzConsumo} kWh)` : '—';
   if (ut) ut.textContent = fmt(calc.total);
-  // Update grand total
   let grand = 0;
   for (const u of UNITS) { const d = unitData[u.id]?.data; if(d) grand += calcUnit(d).total; }
   const gt = document.getElementById('grandTotal');
@@ -382,8 +402,7 @@ function updateCalcDisplay(unitId) {
 
 function renderSavingBadge(unitId) {
   const badge = document.querySelector(`#unit-${unitId} .saving-badge`);
-  if (!badge) return;
-  badge.style.display = (saving[unitId] || 0) > 0 ? 'inline' : 'none';
+  if (badge) badge.style.display = (saving[unitId] || 0) > 0 ? 'inline' : 'none';
 }
 
 // ── WHATSAPP ──────────────────────────────────────────────────────────────────
@@ -412,9 +431,9 @@ async function copyMsg(unitId) {
 function toggleMsg(unitId) {
   if (openMessages.has(unitId)) openMessages.delete(unitId);
   else openMessages.add(unitId);
-  const el = document.getElementById(`msg-${unitId}`);
-  if (el) el.classList.toggle('open', openMessages.has(unitId));
+  const el  = document.getElementById(`msg-${unitId}`);
   const btn = document.querySelector(`#unit-${unitId} .toggle-msg`);
+  if (el)  el.classList.toggle('open', openMessages.has(unitId));
   if (btn) btn.textContent = openMessages.has(unitId) ? '▲ ocultar mensaje' : '▼ ver mensaje';
 }
 
@@ -426,8 +445,7 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function render() {
   document.getElementById('monthLabel').textContent = `${MONTHS_ES[curMonth]} ${curYear}`;
   let grand = 0;
-  let summaryHTML = '';
-  let unitsHTML   = '';
+  let summaryHTML = '', unitsHTML = '';
 
   for (const u of UNITS) {
     const ud     = unitData[u.id];
@@ -437,7 +455,7 @@ function render() {
     if (!noData) grand += calc.total;
 
     const sc = d?.pagado ? 'status-paid' : 'status-pending';
-    const st = d?.pagado ? 'cobrado' : 'pendiente';
+    const st = d?.pagado ? 'cobrado'     : 'pendiente';
 
     summaryHTML += `
       <div class="scard" id="scard-${u.id}">
@@ -493,7 +511,7 @@ function render() {
                   <button class="btn paid-btn ${d.pagado?'btn-paid':'btn-pending'}" onclick="togglePaid('${u.id}')">
                     ${d.pagado?'✓ cobrado':'pendiente'}
                   </button>
-                  <button class="btn btn-copy" id="copy-${u.id}" onclick="copyMsg('${u.id}')">copiar msg</button>
+                  <button class="btn" id="copy-${u.id}" onclick="copyMsg('${u.id}')">copiar msg</button>
                 </div>
               </div>
               <button class="toggle-msg" onclick="toggleMsg('${u.id}')">${msgOpen?'▲ ocultar mensaje':'▼ ver mensaje'}</button>
@@ -502,8 +520,8 @@ function render() {
       </div>`;
   }
 
-  document.getElementById('grandTotal').textContent = grand > 0 ? `Total: ${fmt(grand)}` : '';
-  document.getElementById('summaryGrid').innerHTML  = summaryHTML;
+  document.getElementById('grandTotal').textContent   = grand > 0 ? `Total: ${fmt(grand)}` : '';
+  document.getElementById('summaryGrid').innerHTML    = summaryHTML;
   document.getElementById('unitsContainer').innerHTML = unitsHTML;
 }
 

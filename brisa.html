@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3934 · Brisa — Plan de Pagos</title>
+<style>
+:root {
+  --bg:#0f0e0c;--surface:#1a1916;--surface2:#222118;--border:#2e2c24;--border2:#3a3830;
+  --text:#f0ede4;--text2:#a09a8c;--text3:#5a5648;
+  --gold:#c8a84b;--gold-light:#e8c86c;--gold-bg:#1e1a0c;
+  --green:#2db67c;--green-bg:#0a2018;
+  --red:#e05555;--red-bg:#200e0e;
+  --mono:'Courier New',Courier,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;}
+body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+
+/* LOGIN */
+.login-wrap{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center;}
+.login-eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);}
+.login-title{font-size:28px;font-weight:600;letter-spacing:-.02em;color:var(--text);}
+.login-sub{font-size:13px;color:var(--text2);max-width:300px;line-height:1.6;}
+.login-btn{display:flex;align-items:center;gap:10px;padding:11px 22px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.login-btn:hover{background:var(--surface2);border-color:var(--text3);}
+.login-btn svg{width:18px;height:18px;flex-shrink:0;}
+
+/* HEADER */
+.header{margin-bottom:2rem;}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:6px;}
+.title{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-bottom:2px;}
+.subtitle{font-size:13px;color:var(--text2);}
+.user-badge{font-size:11px;color:var(--green);margin-top:4px;font-family:var(--mono);}
+
+/* PROGRESS HERO */
+.progress-hero{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:12px;}
+.progress-label-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+.progress-amount{font-size:28px;font-weight:700;font-family:var(--mono);color:var(--gold-light);}
+.progress-total{font-size:14px;color:var(--text3);font-family:var(--mono);}
+.progress-pct{font-size:13px;color:var(--text2);font-family:var(--mono);}
+
+.progress-track{height:10px;background:var(--surface2);border-radius:5px;margin-bottom:8px;position:relative;overflow:visible;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:5px;transition:width .6s ease;position:relative;}
+.progress-fill::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:14px;height:14px;background:var(--gold-light);border-radius:50%;border:2px solid var(--bg);}
+.milestone-marker{position:absolute;top:-4px;width:2px;height:18px;background:var(--green);border-radius:1px;}
+.milestone-label{position:absolute;top:20px;font-size:10px;color:var(--green);font-family:var(--mono);white-space:nowrap;transform:translateX(-50%);}
+
+.progress-sub{font-size:12px;color:var(--text3);font-family:var(--mono);}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px;}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.metric-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:6px;}
+.metric-value{font-size:20px;font-weight:600;font-family:var(--mono);color:var(--text);}
+.metric-value.gold{color:var(--gold);}
+.metric-value.green{color:var(--green);}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* MILESTONE CARD */
+.milestone-card{background:var(--green-bg);border:1px solid var(--green);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:12px;}
+.milestone-card-title{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);font-family:var(--mono);margin-bottom:8px;}
+.milestone-card-body{font-size:14px;color:var(--text2);line-height:1.7;}
+.milestone-card-body strong{color:var(--text);}
+.milestone-progress{margin-top:10px;}
+.milestone-track{height:6px;background:var(--surface);border-radius:3px;margin-top:6px;}
+.milestone-fill{height:100%;background:var(--green);border-radius:3px;transition:width .6s ease;}
+.milestone-pct{font-size:11px;color:var(--green);font-family:var(--mono);margin-top:4px;}
+
+/* NEXT PAYMENT */
+.next-card{background:var(--gold-bg);border:1px solid var(--gold);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.next-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-family:var(--mono);margin-bottom:4px;}
+.next-amount{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--gold-light);}
+.next-date{font-size:13px;color:var(--text2);}
+.next-right{text-align:right;}
+.days-badge{font-size:12px;font-family:var(--mono);color:var(--gold);background:rgba(200,168,75,.15);padding:4px 10px;border-radius:6px;}
+
+/* SECTION */
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.section-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);}
+
+/* PAYMENT LOG */
+.payment-log{display:flex;flex-direction:column;gap:4px;}
+.payment-row{display:grid;grid-template-columns:130px 90px 1fr 1fr auto;gap:8px;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;}
+.payment-row.paid{border-color:var(--border);}
+.payment-row.pending{border-color:var(--border);opacity:.7;}
+.payment-row.overdue{border-color:var(--red);background:var(--red-bg);}
+.payment-row.future{opacity:.35;}
+.payment-mes{font-family:var(--mono);color:var(--text2);}
+.payment-cuota{font-family:var(--mono);font-weight:600;text-align:right;}
+.payment-status{display:flex;align-items:center;gap:5px;}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-paid{background:var(--green);}
+.dot-pending{background:var(--gold);}
+.dot-future{background:var(--text3);}
+.payment-date{font-family:var(--mono);color:var(--text3);}
+.mark-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--text2);font-family:var(--sans);}
+.mark-btn:hover{border-color:var(--text3);color:var(--text);}
+.mark-btn.paid-btn{background:rgba(45,182,124,.15);border-color:var(--green);color:var(--green);}
+
+/* REPORT */
+.report-section{margin-top:1.5rem;}
+.report-output{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;color:var(--text2);line-height:1.8;font-family:var(--mono);white-space:pre-wrap;display:none;}
+.report-output.open{display:block;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{height:34px;padding:0 16px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.btn:hover{background:var(--surface2);color:var(--text);}
+.btn-gold{background:var(--gold-bg);color:var(--gold);border-color:var(--gold);}
+.btn-gold:hover{opacity:.8;}
+.btn-green{background:var(--green-bg);color:var(--green);border-color:var(--green);}
+.btn-green:hover{opacity:.8;}
+
+.error-bar{display:none;margin-bottom:1rem;padding:10px 14px;background:var(--red-bg);color:var(--red);border-radius:8px;font-size:13px;}
+.loading-bar{height:2px;background:var(--gold);border-radius:1px;margin-bottom:1rem;animation:shimmer 1.2s infinite;display:none;}
+@keyframes shimmer{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+
+.divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div>
+      <div class="login-eyebrow">3934 family office · brisa</div>
+      <div class="login-title" style="margin-top:6px;">Plan de Pagos</div>
+    </div>
+    <p class="login-sub">Conecta tu cuenta de Chakakuna para acceder al tracker.</p>
+    <button class="login-btn" onclick="signIn()">
+      <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Conectar con Google
+    </button>
+  </div>
+</div>
+
+<div id="appContainer" style="display:none;">
+  <div class="header">
+    <div class="eyebrow">3934 family office · brisa</div>
+    <div class="title">Larco 3934 — Plan de Pagos</div>
+    <div class="subtitle">Delia Brissa Lazo Cano · S/ 1,100,000 · Dic 2025 → Abr 2033</div>
+    <div class="user-badge" id="userBadge"></div>
+  </div>
+
+  <div id="loadingBar" class="loading-bar"></div>
+  <div id="errorMsg" class="error-bar"></div>
+
+  <div class="progress-hero">
+    <div class="progress-label-row">
+      <div>
+        <div class="progress-amount" id="heroAmount">S/ 0</div>
+        <div class="progress-pct" id="heroPct">0% amortizado</div>
+      </div>
+      <div class="progress-total">de S/ 1,100,000</div>
+    </div>
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      <div class="milestone-marker" style="left:50%">
+        <div class="milestone-label">50% · Jul 2029</div>
+      </div>
+    </div>
+    <div class="progress-sub" id="progressSub"></div>
+  </div>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="milestone-card" id="milestoneCard"></div>
+
+  <div class="next-card" id="nextCard"></div>
+
+  <div class="divider"></div>
+
+  <div class="section-header">
+    <div class="section-title">Registro de pagos</div>
+    <div class="btn-row">
+      <button class="btn" onclick="toggleHistory()">ver historial completo</button>
+    </div>
+  </div>
+
+  <div class="payment-log" id="paymentLog"></div>
+
+  <div class="report-section">
+    <div class="divider"></div>
+    <div class="section-header">
+      <div class="section-title">Reporte para Brisa</div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="generateReport()">generar mensaje WhatsApp</button>
+        <button class="btn btn-green" id="copyReportBtn" onclick="copyReport()" style="display:none">copiar</button>
+      </div>
+    </div>
+    <div class="report-output" id="reportOutput"></div>
+  </div>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+const CLIENT_ID   = '779240650302-q68dttktik0dsp08smf8j365gu3gkb3g.apps.googleusercontent.com';
+const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets';
+const TOTAL_PRICE = 1100000;
+const MILESTONE50 = 550000; // 50% → rent drops Jul 2029
+
+// Sheet — fill in after creating
+let SHEET_ID   = '1QdLqzdm6H4Ivm-C63TXGURm4O9pntEls7GFP_rbhjWw';
+let SHEET_NAME = 'Brisa';
+
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Setiembre','Octubre','Noviembre','Diciembre'];
+const REFUERZO  = [2, 7, 12]; // Feb, Jul, Dic
+
+// ── PAYMENT PLAN GENERATOR ────────────────────────────────────────────────────
+
+function generatePlan() {
+  const plan = [];
+  // Dec 2025 — special first payment
+  plan.push({ key:'2025-12', nombre:'Diciembre 2025', cuota:10000, fecha_venc:'30/12/2025' });
+  let y = 2026, m = 1;
+  while (!(y === 2033 && m > 4)) {
+    const isRefuerzo = REFUERZO.includes(m);
+    const key = `${y}-${String(m).padStart(2,'0')}`;
+    plan.push({ key, nombre:`${MONTHS_ES[m-1]} ${y}`, cuota: isRefuerzo ? 20000 : 10000,
+                fecha_venc:`05/${String(m).padStart(2,'0')}/${y}` });
+    m++; if (m > 12) { m = 1; y++; }
+  }
+  return plan;
+}
+
+const PLAN = generatePlan();
+
+// Known payments pre-seeded
+const SEED_PAYMENTS = {
+  '2025-12': { pagado:true, cuota_pagada:10000, fecha_pago:'30/12/2025', notas:'' },
+  '2026-01': { pagado:true, cuota_pagada:10000, fecha_pago:'05/01/2026', notas:'' },
+  '2026-02': { pagado:true, cuota_pagada:20000, fecha_pago:'05/02/2026', notas:'' },
+  '2026-03': { pagado:true, cuota_pagada:10000, fecha_pago:'05/03/2026', notas:'' },
+  '2026-04': { pagado:true, cuota_pagada:10000, fecha_pago:'05/04/2026', notas:'' },
+  '2026-05': { pagado:true, cuota_pagada:10000, fecha_pago:'05/05/2026', notas:'' },
+};
+
+// State
+let accessToken = null;
+let tokenClient = null;
+let payments    = {}; // key → { pagado, cuota_pagada, fecha_pago, notas }
+let showFullHistory = false;
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+
+window.onload = () => {
+  const iv = setInterval(() => {
+    if (window.google?.accounts?.oauth2) {
+      clearInterval(iv);
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID, scope: SCOPES, callback: onToken,
+      });
+    }
+  }, 100);
+  // Load seed into memory
+  payments = JSON.parse(JSON.stringify(SEED_PAYMENTS));
+};
+
+function signIn() {
+  if (!tokenClient) { showError('Google aún no cargó.'); return; }
+  tokenClient.requestAccessToken({ prompt:'' });
+}
+
+function onToken(resp) {
+  if (resp.error) { showError('Error: ' + resp.error); return; }
+  accessToken = resp.access_token;
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization:`Bearer ${accessToken}` } })
+    .then(r=>r.json()).then(info => {
+      const b = document.getElementById('userBadge');
+      if (b) b.textContent = '● ' + (info.email||'conectado');
+    }).catch(()=>{});
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  if (SHEET_ID) loadFromSheet(); else render();
+}
+
+// ── SHEETS (optional — works without too) ─────────────────────────────────────
+
+function setSheet(id) { SHEET_ID = id; }
+
+async function sheetsGet(range) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueRenderOption=UNFORMATTED_VALUE`;
+  const res = await fetch(url, { headers:{ Authorization:`Bearer ${accessToken}` }});
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return res.json();
+}
+
+async function sheetsSet(range, values) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
+  await fetch(url, { method:'PUT', headers:{ Authorization:`Bearer ${accessToken}`, 'Content-Type':'application/json' },
+    body: JSON.stringify({ values }) });
+}
+
+async function loadFromSheet() {
+  showLoading(true);
+  try {
+    const resp = await sheetsGet(`A1:E200`);
+    const rows = resp.values || [];
+    if (rows.length <= 1) {
+      // Sheet empty — write header + seed payments
+      await sheetsSet('A1:E1', [['mes_key','pagado','cuota_pagada','fecha_pago','notas']]);
+      for (const key of Object.keys(SEED_PAYMENTS)) {
+        const p = SEED_PAYMENTS[key];
+        const rowNum = PLAN.findIndex(x=>x.key===key) + 2;
+        await sheetsSet(`A${rowNum}:E${rowNum}`, [[key, p.pagado, p.cuota_pagada, p.fecha_pago, p.notas]]);
+      }
+    } else {
+      for (let i=1; i<rows.length; i++) {
+        const [key, pagado, cuota_pagada, fecha_pago, notas] = rows[i];
+        if (key) payments[key] = {
+          pagado: pagado === true || pagado === 'TRUE',
+          cuota_pagada: parseFloat(cuota_pagada)||0,
+          fecha_pago: fecha_pago||'',
+          notas: notas||''
+        };
+      }
+    }
+    render();
+  } catch(e) { render(); }
+  showLoading(false);
+}
+
+async function savePayment(key) {
+  if (!SHEET_ID || !accessToken) return;
+  const p = payments[key];
+  const rowNum = PLAN.findIndex(x=>x.key===key) + 2; // +2 for header
+  try {
+    await sheetsSet(`A${rowNum}:E${rowNum}`, [[key, p.pagado, p.cuota_pagada, p.fecha_pago, p.notas]]);
+  } catch(e) {}
+}
+
+// ── CALCULATIONS ──────────────────────────────────────────────────────────────
+
+function getStats() {
+  let totalPaid = 0, paidCount = 0, streak = 0, streakActive = true;
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+
+  for (const item of PLAN) {
+    const p = payments[item.key];
+    const paid = p?.pagado;
+    if (paid) { totalPaid += p.cuota_pagada || item.cuota; paidCount++; }
+    if (item.key <= todayKey) {
+      if (paid && streakActive) streak++;
+      else if (!paid) streakActive = false;
+    }
+  }
+
+  const pct = (totalPaid / TOTAL_PRICE * 100);
+  const milestone50pct = (totalPaid / MILESTONE50 * 100);
+  const remaining = TOTAL_PRICE - totalPaid;
+
+  // Find next unpaid
+  let nextItem = null;
+  for (const item of PLAN) {
+    if (!payments[item.key]?.pagado) { nextItem = item; break; }
+  }
+
+  // Days to next payment
+  let daysToNext = null;
+  if (nextItem) {
+    const parts = nextItem.fecha_venc.split('/');
+    const due = new Date(parts[2], parts[1]-1, parts[0]);
+    daysToNext = Math.ceil((due - today) / 86400000);
+  }
+
+  // Milestone: months remaining to 50%
+  let cumul = totalPaid;
+  let monthsTo50 = 0;
+  for (const item of PLAN) {
+    if (cumul >= MILESTONE50) break;
+    if (!payments[item.key]?.pagado) { cumul += item.cuota; monthsTo50++; }
+  }
+
+  return { totalPaid, paidCount, streak, pct, milestone50pct, remaining, nextItem, daysToNext, monthsTo50, totalPlan: PLAN.length };
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+
+function fmt(n) { return 'S/ ' + Number(n).toLocaleString('es-PE', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+
+function render() {
+  const s = getStats();
+
+  // Progress hero
+  document.getElementById('heroAmount').textContent = fmt(s.totalPaid);
+  document.getElementById('heroPct').textContent = s.pct.toFixed(1) + '% de tu propiedad amortizado';
+  document.getElementById('progressFill').style.width = Math.min(s.pct, 100) + '%';
+  document.getElementById('progressSub').textContent =
+    `${fmt(s.remaining)} restantes · ${s.totalPlan - s.paidCount} cuotas por pagar`;
+
+  // Metrics
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric">
+      <div class="metric-label">Pagado</div>
+      <div class="metric-value gold">${fmt(s.totalPaid)}</div>
+      <div class="metric-sub">${s.paidCount} de ${s.totalPlan} cuotas</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Racha</div>
+      <div class="metric-value green">${s.streak} meses</div>
+      <div class="metric-sub">consecutivos al día</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Propietaria</div>
+      <div class="metric-value">${s.pct.toFixed(1)}%</div>
+      <div class="metric-sub">de Larco 3934</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Meta final</div>
+      <div class="metric-value">Abr 2033</div>
+      <div class="metric-sub">al ritmo actual</div>
+    </div>
+  `;
+
+  // Milestone card
+  const m50pct = Math.min(s.milestone50pct, 100);
+  const rentaActual = 2600, rentaFase2 = 800, ahorro = rentaActual - rentaFase2;
+  document.getElementById('milestoneCard').innerHTML = `
+    <div class="milestone-card-title">🎯 Próximo hito — Julio 2029</div>
+    <div class="milestone-card-body">
+      Cuando amortices <strong>S/ 550,000 (50%)</strong>, tu merced conductiva baja de
+      <strong>S/ 2,600</strong> a <strong>S/ 800</strong> por mes.
+      Eso son <strong>S/ ${ahorro.toLocaleString()}/mes menos</strong> — <strong>S/ ${(ahorro*12).toLocaleString()} al año</strong> que se quedan contigo.
+    </div>
+    <div class="milestone-progress">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:var(--mono);">
+        <span>${fmt(s.totalPaid)}</span><span>S/ 550,000</span>
+      </div>
+      <div class="milestone-track"><div class="milestone-fill" style="width:${m50pct}%"></div></div>
+      <div class="milestone-pct">${m50pct.toFixed(1)}% hacia el hito · ~${s.monthsTo50} cuotas</div>
+    </div>
+  `;
+
+  // Next payment card
+  if (s.nextItem) {
+    const isLate = s.daysToNext !== null && s.daysToNext < 0;
+    const daysText = s.daysToNext === null ? '' :
+      s.daysToNext > 0 ? `en ${s.daysToNext} días` :
+      s.daysToNext === 0 ? 'hoy' : `hace ${Math.abs(s.daysToNext)} días`;
+    document.getElementById('nextCard').innerHTML = `
+      <div>
+        <div class="next-label">Próximo pago</div>
+        <div class="next-amount">${fmt(s.nextItem.cuota)}</div>
+        <div class="next-date">${s.nextItem.fecha_venc} · ${s.nextItem.nombre}</div>
+      </div>
+      <div class="next-right">
+        <div class="days-badge" style="${isLate?'color:var(--red);background:rgba(224,85,85,.15);border-color:var(--red)':''}">${daysText}</div>
+      </div>
+    `;
+  }
+
+  // Payment log
+  renderLog();
+}
+
+function renderLog() {
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  const rows = showFullHistory ? PLAN : PLAN.slice(0, PLAN.findIndex(x=>!payments[x.key]?.pagado) + 4).filter(Boolean);
+  const list = rows.length ? rows : PLAN.slice(0, 8);
+
+  document.getElementById('paymentLog').innerHTML = list.map(item => {
+    const p = payments[item.key];
+    const paid = p?.pagado;
+    const isFuture = item.key > todayKey && !paid;
+    const cls = paid ? 'paid' : isFuture ? 'future' : 'pending';
+    const dotCls = paid ? 'dot-paid' : isFuture ? 'dot-future' : 'dot-pending';
+    const statusText = paid ? 'pagado' : isFuture ? 'pendiente' : 'por cobrar';
+    const cuotaColor = item.cuota === 20000 ? 'color:var(--gold)' : '';
+
+    return `
+      <div class="payment-row ${cls}">
+        <div class="payment-mes">${item.nombre}</div>
+        <div class="payment-cuota" style="${cuotaColor}">${fmt(item.cuota)}</div>
+        <div class="payment-status">
+          <div class="status-dot ${dotCls}"></div>
+          <span style="color:var(--text3)">${statusText}</span>
+        </div>
+        <div class="payment-date">${p?.fecha_pago || item.fecha_venc}</div>
+        <div style="display:flex;gap:4px;">
+          ${!paid && !isFuture
+            ? `<button class="mark-btn" onclick="markPaid('${item.key}')">marcar pagado</button>`
+            : paid
+              ? `<button class="mark-btn paid-btn" onclick="unmarkPaid('${item.key}')">✓</button>
+                 <button class="mark-btn" onclick="generarRecibo('${item.key}')" style="font-size:10px;">recibo</button>`
+              : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleHistory() {
+  showFullHistory = !showFullHistory;
+  renderLog();
+  const btn = document.querySelector('[onclick="toggleHistory()"]');
+  if (btn) btn.textContent = showFullHistory ? 'ocultar historial' : 'ver historial completo';
+}
+
+function markPaid(key) {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2,'0');
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const yyyy = today.getFullYear();
+  const item = PLAN.find(x=>x.key===key);
+  payments[key] = { pagado:true, cuota_pagada:item.cuota, fecha_pago:`${dd}/${mm}/${yyyy}`, notas:'' };
+  savePayment(key);
+  render();
+}
+
+function unmarkPaid(key) {
+  if (!confirm('¿Quitar este pago?')) return;
+  payments[key] = { pagado:false, cuota_pagada:0, fecha_pago:'', notas:'' };
+  savePayment(key);
+  render();
+}
+
+// ── REPORT GENERATOR ──────────────────────────────────────────────────────────
+
+function generateReport() {
+  const s = getStats();
+  const today = new Date();
+  const mesActual = `${MONTHS_ES[today.getMonth()]} ${today.getFullYear()}`;
+  const ahorro = 2600 - 800;
+  const ownedPct = s.pct.toFixed(1);
+
+  const msg = `Hola Brisa 🏠
+
+*Estado de tu propiedad — ${mesActual}*
+
+Llevas *${fmt(s.totalPaid)}* pagados en capital.
+Eso representa el *${ownedPct}%* de Larco 3934.
+
+🔥 *Racha:* ${s.streak} pagos consecutivos al día ✅
+
+—
+
+🎯 *Tu próximo gran hito: Julio 2029*
+Cuando llegues a S/ 550,000 (50%), tu merced conductiva baja de S/ 2,600 a S/ 800.
+Eso son *S/ ${ahorro.toLocaleString()}/mes menos* — S/ ${(ahorro*12).toLocaleString()} al año que se quedan en tu bolsillo.
+Vas por *${s.milestone50pct.toFixed(0)}%* del camino a ese hito.
+
+—
+
+📅 *Próximo pago:*
+${s.nextItem ? `*${fmt(s.nextItem.cuota)}* → ${s.nextItem.fecha_venc}` : 'al día'}
+
+📊 *Tu proyección:*
+Fecha de término estimada: *Abril 2033*
+Capital restante: ${fmt(s.remaining)}
+
+Gracias por tu puntualidad, Brisa. Cada cuota te acerca más a tener Larco 3934 completamente tuyo 💪
+
+_Larco 3934 — Tu hogar_`;
+
+  const el = document.getElementById('reportOutput');
+  el.textContent = msg;
+  el.classList.add('open');
+  document.getElementById('copyReportBtn').style.display = 'inline-block';
+}
+
+async function copyReport() {
+  const text = document.getElementById('reportOutput').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = document.getElementById('copyReportBtn');
+    btn.textContent = '✓ copiado';
+    setTimeout(() => { btn.textContent = 'copiar'; }, 2000);
+  } catch(e) {}
+}
+
+function generarRecibo(key) {
+  const item  = PLAN.find(x => x.key === key);
+  const p     = payments[key];
+  if (!item || !p?.pagado) return;
+
+  // Calculate cumulative paid up to and including this payment
+  let acumHasta = 0;
+  for (const i of PLAN) {
+    if (payments[i.key]?.pagado) acumHasta += payments[i.key].cuota_pagada || i.cuota;
+    if (i.key === key) break;
+  }
+  const saldo    = TOTAL_PRICE - acumHasta;
+  const pct      = (acumHasta / TOTAL_PRICE * 100).toFixed(2);
+  const numRecibo = `REC-${key.replace('-','')}`;
+
+  // Next payment info
+  let nextItem = null;
+  for (const i of PLAN) {
+    if (!payments[i.key]?.pagado) { nextItem = i; break; }
+  }
+
+  const fmtNum = n => 'S/ ' + Number(n).toLocaleString('es-PE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const today  = new Date();
+  const fechaEmision = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Recibo ${numRecibo}</title>
+<style>
+  @page { size: A4; margin: 2cm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Georgia', serif; font-size: 11pt; color: #1a1a18; background: #fff; }
+  .page { max-width: 700px; margin: 0 auto; padding: 40px; }
+
+  .header { border-bottom: 2px solid #1a1a18; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .entity-name { font-size: 15pt; font-weight: bold; letter-spacing: -.01em; }
+  .entity-sub { font-size: 9pt; color: #5a5a56; margin-top: 3px; }
+  .rec-block { text-align: right; }
+  .rec-num { font-size: 13pt; font-weight: bold; font-family: 'Courier New', monospace; }
+  .rec-date { font-size: 9pt; color: #5a5a56; margin-top: 4px; }
+
+  .doc-title { font-size: 14pt; font-weight: bold; text-align: center; letter-spacing: .05em; text-transform: uppercase; margin: 20px 0 24px; border: 1px solid #1a1a18; padding: 10px; }
+
+  .section { margin-bottom: 20px; }
+  .section-title { font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; color: #5a5a56; border-bottom: 0.5px solid #d0cfc8; padding-bottom: 4px; margin-bottom: 10px; }
+
+  .party-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .field-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 0.5px dotted #e2e1da; font-size: 10pt; }
+  .field-label { color: #5a5a56; }
+  .field-val { font-weight: bold; text-align: right; }
+
+  .prop-box { background: #f4f3ef; border: 0.5px solid #d0cfc8; border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 10pt; line-height: 1.7; }
+
+  .pago-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .pago-table th { background: #1a1a18; color: #fff; font-size: 9pt; text-transform: uppercase; letter-spacing: .05em; padding: 8px 12px; text-align: left; }
+  .pago-table td { padding: 8px 12px; font-size: 10pt; border-bottom: 0.5px solid #e2e1da; }
+  .pago-table tr:last-child td { border-bottom: none; }
+  .pago-table .amount { text-align: right; font-family: 'Courier New', monospace; font-weight: bold; }
+
+  .saldo-box { background: #1a1a18; color: #fff; border-radius: 4px; padding: 14px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .saldo-label { font-size: 9pt; opacity: .7; text-transform: uppercase; letter-spacing: .08em; }
+  .saldo-amount { font-size: 16pt; font-family: 'Courier New', monospace; font-weight: bold; }
+  .saldo-pct { font-size: 9pt; opacity: .7; }
+
+  .progress-section { margin-bottom: 24px; }
+  .progress-bar-outer { height: 8px; background: #e2e1da; border-radius: 4px; margin: 6px 0 4px; }
+  .progress-bar-inner { height: 100%; background: #c8a84b; border-radius: 4px; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 9pt; color: #5a5a56; font-family: 'Courier New', monospace; }
+
+  .next-box { border: 1px dashed #d0cfc8; border-radius: 4px; padding: 12px 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 10pt; }
+  .next-label { font-size: 9pt; color: #5a5a56; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+
+  .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+  .sig-block { text-align: center; }
+  .sig-line { border-top: 1px solid #1a1a18; padding-top: 8px; margin-top: 40px; font-size: 9pt; color: #5a5a56; }
+  .sig-name { font-weight: bold; font-size: 10pt; color: #1a1a18; }
+
+  .footer-note { margin-top: 24px; border-top: 0.5px solid #d0cfc8; padding-top: 12px; font-size: 8pt; color: #9a9a94; line-height: 1.6; text-align: center; }
+
+  @media print {
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="no-print" style="text-align:right; margin-bottom:16px;">
+    <button onclick="window.print()" style="padding:8px 20px; background:#1a1a18; color:#fff; border:none; border-radius:6px; font-size:12px; cursor:pointer;">
+      Imprimir / Guardar PDF
+    </button>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="entity-name">Administradora de Propiedades 3934</div>
+      <div class="entity-sub">Nicolás Vargas Ortiz & Rosalina Ugalde Solorzano<br>
+      Representados por: Luiggi Nicolás Vargas Ugalde · DNI 44812803</div>
+    </div>
+    <div class="rec-block">
+      <div class="rec-num">${numRecibo}</div>
+      <div class="rec-date">Emitido: ${fechaEmision}</div>
+    </div>
+  </div>
+
+  <div class="doc-title">Constancia de Pago — Cuota de Capital</div>
+
+  <div class="section">
+    <div class="section-title">Partes del contrato</div>
+    <div class="party-grid">
+      <div>
+        <div style="font-size:9pt; color:#5a5a56; margin-bottom:6px;">Vendedores</div>
+        <div style="font-size:10pt; font-weight:bold;">Nicolás Vargas Ortiz</div>
+        <div style="font-size:9pt; color:#5a5a56;">DNI: 08591823</div>
+        <div style="font-size:10pt; font-weight:bold; margin-top:6px;">Rosalina Ugalde Solorzano</div>
+        <div style="font-size:9pt; color:#5a5a56;">DNI: 08591824</div>
+      </div>
+      <div>
+        <div style="font-size:9pt; color:#5a5a56; margin-bottom:6px;">Compradora</div>
+        <div style="font-size:10pt; font-weight:bold;">Delia Brissa Lazo Cano</div>
+        <div style="font-size:9pt; color:#5a5a56;">DNI: 76578580</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Bien inmueble</div>
+    <div class="prop-box">
+      <strong>Jr. Víctor Larco Herrera 3934</strong>, Calle 8 Manzana U Lote 22<br>
+      Urbanización Panamericana Norte, Los Olivos, Lima<br>
+      Partida Electrónica N° 43941941 — Registro de Predios de Lima, SUNARP<br>
+      Precio de venta total: <strong>S/ 1,100,000.00</strong> · Contrato: 30 de diciembre de 2025
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Detalle del pago</div>
+    <table class="pago-table">
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th>Período</th>
+          <th>Fecha de pago</th>
+          <th style="text-align:right">Monto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cuota de capital${item.cuota === 20000 ? ' (cuota de refuerzo)' : ''}</td>
+          <td>${item.nombre}</td>
+          <td>${p.fecha_pago || '—'}</td>
+          <td class="amount">${fmtNum(p.cuota_pagada || item.cuota)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Estado de cuenta acumulado</div>
+    <div class="field-row"><span class="field-label">Precio total del contrato</span><span class="field-val">${fmtNum(TOTAL_PRICE)}</span></div>
+    <div class="field-row"><span class="field-label">Capital amortizado hasta este pago</span><span class="field-val" style="color:#1D9E75">${fmtNum(acumHasta)}</span></div>
+    <div class="field-row" style="border-bottom:none; padding-top:8px;"><span class="field-label" style="font-weight:bold;">Capital pendiente</span><span class="field-val" style="font-size:12pt">${fmtNum(saldo)}</span></div>
+  </div>
+
+  <div class="saldo-box">
+    <div>
+      <div class="saldo-label">Saldo pendiente</div>
+      <div class="saldo-amount">${fmtNum(saldo)}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="saldo-pct">${pct}% amortizado</div>
+      <div style="font-size:10pt; margin-top:4px; color:#c8a84b">${(100 - parseFloat(pct)).toFixed(2)}% restante</div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="section-title">Avance del contrato</div>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" style="width:${Math.min(parseFloat(pct),100)}%"></div>
+    </div>
+    <div class="progress-labels">
+      <span>S/ 0</span>
+      <span style="color:#c8a84b">${pct}% completado</span>
+      <span>S/ 1,100,000</span>
+    </div>
+  </div>
+
+  ${nextItem ? `
+  <div class="next-box">
+    <div>
+      <div class="next-label">Próximo pago</div>
+      <div style="font-weight:bold;">${nextItem.nombre}</div>
+      <div style="color:#5a5a56; font-size:9pt;">Vencimiento: ${nextItem.fecha_venc}</div>
+    </div>
+    <div style="text-align:right; font-size:14pt; font-family:'Courier New',monospace; font-weight:bold;">${fmtNum(nextItem.cuota)}</div>
+  </div>` : ''}
+
+  <div class="signatures">
+    <div class="sig-block">
+      <div class="sig-line">
+        <div class="sig-name">Luiggi Nicolás Vargas Ugalde</div>
+        <div>Apoderado de los vendedores · DNI 44812803</div>
+      </div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line">
+        <div class="sig-name">Delia Brissa Lazo Cano</div>
+        <div>Compradora · DNI 76578580</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Este documento es una constancia de pago emitida en el marco del Contrato Privado de Compraventa con Reserva de Propiedad
+    celebrado el 30 de diciembre de 2025. La transferencia de propiedad quedará perfeccionada una vez cancelado
+    el precio total de S/ 1,100,000.00 y levantada la hipoteca inscrita, conforme a la Cláusula Séptima del contrato.
+    El voucher de depósito bancario constituye el único medio probatorio válido del pago, conforme a la Cláusula Tercera.
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+function showLoading(on) { document.getElementById('loadingBar').style.display = on?'block':'none'; }
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display='none', 5000);
+}
+</script>
+</body>
+</html>

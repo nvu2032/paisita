@@ -3,162 +3,449 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3934 · Varguitas</title>
+<title>Paisita — Gestión de alquileres en Lima</title>
+<meta name="description" content="Paisita pone orden con cariño. Herramienta para administrar tus alquileres en Lima, construida para el contexto peruano.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#fafaf8;--surface:#ffffff;--surface2:#f4f3ef;--border:#e2e1da;--border2:#d0cfc8;
-  --text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;
-  --accent:#c8a84b;--accent-bg:#fdf8ec;
-  --green:#1D9E75;
-  --mono:'Courier New',Courier,monospace;
-  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#161614;--surface:#1e1e1c;--surface2:#252522;--border:#2e2e2a;--border2:#3a3a36;
-    --text:#f0efe8;--text2:#9a9a92;--text3:#5a5a54;
-    --accent:#d4a84b;--accent-bg:#2a2310;
-  }
+  --cream:#faf8f3;
+  --cream2:#f2efe6;
+  --cream3:#e8e3d6;
+  --ink:#1c1a14;
+  --ink2:#4a4535;
+  --ink3:#8a826e;
+  --sage:#6b8c6a;
+  --sage-light:#e8f0e7;
+  --gold:#b8922a;
+  --gold-light:#f5edd8;
+  --gold-border:#d4aa55;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'DM Sans',-apple-system,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;min-height:100vh;}
-body{max-width:560px;margin:0 auto;padding:4rem 1.5rem;}
+html{background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;}
+body{overflow-x:hidden;}
 
-/* Login */
-.login-wrap{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;text-align:center;}
-.login-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);}
-.login-title{font-size:32px;font-weight:600;letter-spacing:-.03em;}
-.login-sub{font-size:13px;color:var(--text2);max-width:300px;line-height:1.6;}
-.login-btn{display:flex;align-items:center;gap:10px;padding:10px 22px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
-.login-btn:hover{background:var(--surface2);border-color:var(--text3);}
-.login-btn svg{width:18px;height:18px;flex-shrink:0;}
+/* ── NAV ── */
+nav{
+  max-width:1100px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.5rem 2rem;
+}
+.nav-logo{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+.nav-logo span{color:var(--sage);}
+.nav-right{display:flex;align-items:center;gap:1.5rem;}
+.nav-link{font-size:13px;color:var(--ink3);text-decoration:none;}
+.nav-link:hover{color:var(--ink);}
+.nav-btn{font-size:13px;padding:7px 16px;border:1px solid var(--cream3);background:var(--cream2);color:var(--ink2);border-radius:6px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.nav-btn:hover{border-color:var(--ink3);color:var(--ink);}
 
-/* App */
-.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:10px;}
-.title{font-size:32px;font-weight:600;letter-spacing:-.03em;margin-bottom:6px;}
-.subtitle{font-size:14px;color:var(--text2);margin-bottom:.5rem;line-height:1.6;}
-.user-badge{font-size:11px;color:var(--green);font-family:var(--mono);margin-bottom:2.5rem;}
+/* ── HERO ── */
+.hero{
+  max-width:1100px;margin:0 auto;
+  min-height:88vh;
+  display:grid;grid-template-columns:1fr 420px;
+  align-items:center;
+  padding:2rem 2rem 0;
+  gap:2rem;
+  position:relative;
+}
+.hero-text{padding-bottom:3rem;}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--sage);font-family:var(--sans);font-weight:500;
+  margin-bottom:1.5rem;
+}
+.hero-tag::before{content:'';width:24px;height:1px;background:var(--sage);}
+h1{
+  font-family:var(--serif);
+  font-size:clamp(44px,6vw,72px);
+  font-weight:700;
+  line-height:1.05;
+  letter-spacing:-.03em;
+  color:var(--ink);
+  margin-bottom:1rem;
+}
+h1 em{font-style:italic;color:var(--sage);}
+.hero-tagline{
+  font-family:var(--serif);
+  font-size:clamp(18px,2.5vw,24px);
+  font-weight:400;
+  font-style:italic;
+  color:var(--ink2);
+  margin-bottom:1.5rem;
+  line-height:1.4;
+}
+.hero-desc{
+  font-size:15px;color:var(--ink3);line-height:1.8;
+  max-width:420px;margin-bottom:2.5rem;
+}
+.hero-desc strong{color:var(--ink2);}
+.hero-actions{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.btn-primary{
+  display:inline-block;
+  background:var(--ink);color:var(--cream);
+  padding:13px 28px;border-radius:8px;
+  font-size:14px;font-weight:500;
+  text-decoration:none;letter-spacing:-.01em;
+  transition:opacity .15s;border:none;cursor:pointer;
+  font-family:var(--sans);
+}
+.btn-primary:hover{opacity:.82;}
+.btn-secondary{
+  font-size:13px;color:var(--ink3);
+  background:none;border:none;cursor:pointer;
+  font-family:var(--sans);
+  text-decoration:underline;text-underline-offset:3px;
+}
+.btn-secondary:hover{color:var(--ink);}
 
-.properties{display:flex;flex-direction:column;gap:10px;margin-bottom:3rem;}
-.prop-card{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:border-color .15s, background .15s;cursor:pointer;}
-.prop-card:hover{border-color:var(--border2);background:var(--surface2);}
-.prop-card.inactive{opacity:.45;cursor:not-allowed;pointer-events:none;}
-.prop-left{display:flex;align-items:center;gap:14px;}
-.prop-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
-.prop-name{font-size:17px;font-weight:600;letter-spacing:-.01em;}
-.prop-meta{font-size:12px;color:var(--text3);font-family:var(--mono);margin-top:2px;}
-.prop-right{display:flex;align-items:center;gap:10px;}
-.prop-badge{font-size:11px;padding:3px 9px;border-radius:10px;font-family:var(--mono);}
-.badge-active{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
-.badge-soon{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent);}
-.prop-arrow{color:var(--text3);font-size:16px;}
-.divider{border:none;border-top:1px solid var(--border);margin:2.5rem 0;}
-.footer{font-size:12px;color:var(--text3);font-family:var(--mono);line-height:1.9;}
-.footer strong{color:var(--text2);}
+/* ── PAISITA ILLUSTRATION ── */
+.hero-visual{
+  position:relative;
+  display:flex;align-items:flex-end;justify-content:center;
+  height:580px;
+  padding-bottom:0;
+}
+.paisita-img{
+  height:520px;
+  width:auto;
+  object-fit:contain;
+  object-position:bottom;
+  position:relative;
+  z-index:2;
+  filter:drop-shadow(0 20px 40px rgba(28,26,20,.12));
+  animation:float 6s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+.hero-bg-blob{
+  position:absolute;
+  width:380px;height:380px;
+  background:var(--sage-light);
+  border-radius:60% 40% 55% 45% / 45% 55% 45% 55%;
+  bottom:40px;left:50%;transform:translateX(-50%);
+  z-index:1;
+  animation:morph 8s ease-in-out infinite;
+}
+@keyframes morph{
+  0%,100%{border-radius:60% 40% 55% 45% / 45% 55% 45% 55%;}
+  50%{border-radius:45% 55% 40% 60% / 55% 45% 60% 40%;}
+}
+
+/* ── DIVIDER STRIP ── */
+.strip{background:var(--ink);color:var(--cream);padding:.75rem 2rem;overflow:hidden;}
+.strip-inner{
+  display:flex;gap:3rem;
+  animation:scroll 20s linear infinite;
+  white-space:nowrap;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--sans);opacity:.7;
+}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.strip-dot{color:var(--gold-border);margin:0 .5rem;}
+
+/* ── SECTIONS ── */
+.section{max-width:680px;margin:0 auto;padding:5rem 2rem;}
+
+/* Story */
+.story-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-family:var(--sans);margin-bottom:1.5rem;}
+.story-text{
+  font-family:var(--serif);
+  font-size:clamp(18px,2.5vw,22px);
+  line-height:1.7;color:var(--ink2);
+}
+.story-text strong{color:var(--ink);}
+.story-text em{font-style:italic;color:var(--sage);}
+
+/* Features */
+.features-grid{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--cream3);}
+.feature{
+  display:grid;grid-template-columns:32px 1fr;gap:16px;
+  padding:1.5rem 0;border-bottom:1px solid var(--cream3);
+  align-items:start;
+}
+.feature-num{font-family:var(--serif);font-size:13px;color:var(--ink3);font-style:italic;margin-top:3px;}
+.feature-name{font-weight:500;font-size:15px;margin-bottom:4px;}
+.feature-desc{font-size:13px;color:var(--ink3);line-height:1.7;}
+
+/* In use */
+.in-use-box{
+  background:var(--cream2);border:1px solid var(--cream3);
+  border-radius:16px;padding:2rem;
+  display:grid;grid-template-columns:1fr auto;
+  gap:1.5rem;align-items:center;
+}
+.in-use-text{font-size:14px;color:var(--ink2);line-height:1.8;}
+.in-use-text strong{color:var(--ink);}
+.in-use-nums{display:flex;gap:2rem;flex-shrink:0;}
+.num-block{text-align:center;}
+.num-val{font-family:var(--serif);font-size:36px;font-weight:700;color:var(--ink);line-height:1;}
+.num-lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-top:4px;}
+
+/* CTA */
+.cta-box{
+  background:var(--ink);border-radius:20px;
+  padding:3rem 2.5rem;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-box::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 50%, rgba(107,140,106,.25) 0%, transparent 60%);
+  pointer-events:none;
+}
+.cta-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,248,243,.4);font-family:var(--sans);margin-bottom:1rem;}
+.cta-title{font-family:var(--serif);font-size:clamp(24px,4vw,36px);font-weight:700;color:var(--cream);letter-spacing:-.02em;line-height:1.2;margin-bottom:.75rem;}
+.cta-sub{font-size:14px;color:rgba(250,248,243,.6);margin-bottom:2rem;line-height:1.7;}
+.cta-btn{
+  display:inline-block;
+  background:var(--cream);color:var(--ink);
+  padding:13px 32px;border-radius:8px;
+  font-size:14px;font-weight:500;
+  text-decoration:none;letter-spacing:-.01em;
+  transition:opacity .15s;
+}
+.cta-btn:hover{opacity:.88;}
+.cta-note{font-size:12px;color:rgba(250,248,243,.35);margin-top:1rem;}
+
+/* Auth section */
+.auth-wrap{text-align:center;padding:3rem 0 5rem;}
+.auth-label{font-size:12px;color:var(--ink3);margin-bottom:1rem;letter-spacing:.04em;}
+.google-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 22px;border-radius:8px;
+  border:1px solid var(--cream3);background:white;
+  color:var(--ink2);font-size:13px;cursor:pointer;
+  font-family:var(--sans);transition:all .15s;
+  box-shadow:0 1px 3px rgba(28,26,20,.08);
+}
+.google-btn:hover{border-color:var(--cream3);box-shadow:0 2px 8px rgba(28,26,20,.12);}
+.google-btn svg{width:16px;height:16px;flex-shrink:0;}
+
+/* Footer */
+.footer{
+  border-top:1px solid var(--cream3);
+  padding:2rem;
+  display:flex;justify-content:space-between;align-items:center;
+  max-width:1100px;margin:0 auto;flex-wrap:wrap;gap:.75rem;
+}
+.footer-brand{font-family:var(--serif);font-size:14px;color:var(--ink2);}
+.footer-note{font-size:12px;color:var(--ink3);}
+.user-badge{font-size:12px;color:var(--sage);}
+
+/* Dashboard */
+.dash-wrap{max-width:560px;margin:0 auto;padding:3rem 2rem 5rem;}
+.dash-greeting{font-family:var(--serif);font-size:28px;font-weight:600;margin-bottom:.5rem;letter-spacing:-.02em;}
+.dash-sub{font-size:13px;color:var(--ink3);margin-bottom:2rem;}
+.prop-card{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;background:white;
+  border:1px solid var(--cream3);border-radius:10px;
+  text-decoration:none;color:var(--ink);
+  transition:all .15s;margin-bottom:8px;
+  box-shadow:0 1px 3px rgba(28,26,20,.05);
+}
+.prop-card:hover{border-color:var(--cream3);box-shadow:0 3px 12px rgba(28,26,20,.1);transform:translateY(-1px);}
+.prop-card.inactive{opacity:.4;cursor:not-allowed;pointer-events:none;box-shadow:none;}
+.prop-left{display:flex;align-items:center;gap:12px;}
+.prop-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.prop-name{font-size:15px;font-weight:500;}
+.prop-meta{font-size:11px;color:var(--ink3);margin-top:2px;}
+.prop-right{display:flex;align-items:center;gap:8px;}
+.badge{font-size:10px;padding:2px 8px;border-radius:6px;letter-spacing:.04em;}
+.badge-active{background:var(--sage-light);color:var(--sage);}
+.badge-soon{background:var(--gold-light);color:var(--gold);}
+.prop-arrow{color:var(--ink3);font-size:14px;}
+
+@media(max-width:700px){
+  .hero{grid-template-columns:1fr;min-height:auto;padding-top:1.5rem;}
+  .hero-visual{height:300px;order:-1;}
+  .paisita-img{height:280px;}
+  .hero-bg-blob{width:240px;height:240px;}
+  .in-use-box{grid-template-columns:1fr;}
+  .footer{flex-direction:column;text-align:center;}
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen">
-  <div class="login-wrap">
-    <div>
-      <div class="login-eyebrow">3934 Family Office</div>
-      <div class="login-title" style="margin-top:8px;">Varguitas</div>
-    </div>
-    <p class="login-sub">Acceso restringido. Ingresa con tu cuenta de 3934 para continuar.</p>
-    <button class="login-btn" onclick="signIn()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-      Conectar con Google
-    </button>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Pai<span>sita</span></div>
+  <div class="nav-right">
+    <button class="nav-btn" id="navLoginBtn" onclick="signIn()">Acceder →</button>
   </div>
+</nav>
+
+<!-- PUBLIC LANDING -->
+<div id="landing">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Tus alquileres,<br><em>en orden.</em></h1>
+      <div class="hero-tagline">Paisita pone orden con cariño.</div>
+      <p class="hero-desc">
+        Lecturas de agua y luz, cálculo automático, registro de cobros,
+        y el mensaje de WhatsApp listo para copiar.
+        <strong>Construido en Lima para el contexto peruano.</strong>
+      </p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="https://wa.me/51913115355?text=Hola%2C%20quiero%20un%20Paisita%20para%20mis%20alquileres" target="_blank">
+          Quiero un Paisita
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-bg-blob"></div>
+      <img class="paisita-img" src="paisita_3934.png" alt="Paisita — el que pone orden con cariño">
+    </div>
+  </div>
+
+  <!-- STORY -->
+  <div class="section">
+    <div class="story-label">Por qué existe</div>
+    <div class="story-text">
+      Mis papás administran una propiedad en Lima. Y cada mes era lo mismo: llenaban un cuaderno,
+      tomaban fotos de los medidores, buscaban la lectura del mes anterior, cotejaban con los recibos,
+      calculaban los consumos, llamaban para avisar de las fechas a los inquilinos y hacían sus cálculos
+      para pagar sus tributos.
+      <br><br>
+      Yo crecí viéndolos llevar sus cuentas muy ordenadas, y ahora que están mayores he convertido
+      ese orden en un micro-sistema digital. <strong>Mismo orden, más eficiente.</strong>
+      Ya tiene funcionando más de 1 año, y ahora lo ofrezco a otros propietarios que tienen el mismo problema.
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section" style="padding-top:0">
+    <div class="story-label" style="margin-bottom:1.5rem">Así funciona Paisita</div>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-num">01</div>
+        <div>
+          <div class="feature-name">Lecturas y cálculo automático</div>
+          <div class="feature-desc">Ingresas la lectura actual de agua y luz. Paisita calcula el consumo, aplica la tarifa, y suma con la renta. Sin fórmulas.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">02</div>
+        <div>
+          <div class="feature-name">Registro de cobros</div>
+          <div class="feature-desc">Marca cada unidad como cobrada al recibir el voucher. El historial queda en Google Sheets — siempre accesible, siempre tuyo.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">03</div>
+        <div>
+          <div class="feature-name">Mensaje WhatsApp listo para copiar</div>
+          <div class="feature-desc">Genera el desglose completo de renta + agua + luz con el total. Un clic y está en tu portapapeles.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-num">04</div>
+        <div>
+          <div class="feature-name">Desde cualquier dispositivo</div>
+          <div class="feature-desc">Corre en el browser. Tú y tu asistente pueden usarlo desde cualquier lugar con una cuenta Google autorizada.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN USE -->
+  <div class="section" style="padding-top:0">
+    <div class="in-use-box">
+      <div class="in-use-text">
+        <strong>En uso activo hoy.</strong><br>
+        Lima, Perú<br>
+        Creado por @nico.nvu
+      </div>
+      <div class="in-use-nums">
+        <div class="num-block">
+          <div class="num-val">2</div>
+          <div class="num-lab">propiedades</div>
+        </div>
+        <div class="num-block">
+          <div class="num-val">7</div>
+          <div class="num-lab">unidades</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="section" style="padding-top:0">
+    <div class="cta-box">
+      <div class="cta-label">¿Quieres Paisita?</div>
+      <div class="cta-title">Lo configuro para<br>tus alquileres.</div>
+      <div class="cta-sub">
+        Tus propiedades, tus tarifas, tu privacidad.
+      </div>
+      <a class="cta-btn" href="https://wa.me/51913115355?text=Hola%2C%20quiero%20un%20Paisita%20para%20mis%20alquileres" target="_blank">
+        Quiero un Paisita
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">Paisita · 3934</div>
+    <div class="footer-note">Hecho en Lima, Perú · @nico.nvu</div>
+  </div>
+
 </div>
 
-<!-- APP -->
-<div id="appContainer" style="display:none;">
-
-  <div class="eyebrow">3934 Family Office</div>
-  <h1 class="title">Varguitas</h1>
-  <p class="subtitle">Sistema de gestión de rentas de 3934, administrado por @nvu</p>
-  <div class="user-badge" id="userBadge"></div>
-
-  <div class="properties">
+<!-- DASHBOARD (post-auth) -->
+<div id="dashboard" style="display:none;">
+  <div class="dash-wrap">
+    <div class="dash-greeting">Bienvenido, paisita.</div>
+    <div class="dash-sub" id="userBadge">Cargando...</div>
 
     <a class="prop-card" href="larco.html">
       <div class="prop-left">
         <div class="prop-dot" style="background:#1D9E75"></div>
-        <div>
-          <div class="prop-name">Larco</div>
-          <div class="prop-meta">3 unidades · 101 · 201 · 202</div>
-        </div>
+        <div><div class="prop-name">Larco</div><div class="prop-meta">3 unidades · 101 · 201 · 202</div></div>
       </div>
-      <div class="prop-right">
-        <span class="prop-badge badge-active">activo</span>
-        <span class="prop-arrow">→</span>
-      </div>
+      <div class="prop-right"><span class="badge badge-active">activo</span><span class="prop-arrow">→</span></div>
     </a>
 
     <a class="prop-card" href="rosa.html">
       <div class="prop-left">
         <div class="prop-dot" style="background:#378ADD"></div>
-        <div>
-          <div class="prop-name">Rosa</div>
-          <div class="prop-meta">4 unidades · 301 · 302 · 401 · 402</div>
-        </div>
+        <div><div class="prop-name">Rosa</div><div class="prop-meta">4 unidades · 301 · 302 · 401 · 402</div></div>
       </div>
-      <div class="prop-right">
-        <span class="prop-badge badge-active">activo</span>
-        <span class="prop-arrow">→</span>
-      </div>
+      <div class="prop-right"><span class="badge badge-active">activo</span><span class="prop-arrow">→</span></div>
     </a>
 
     <a class="prop-card" href="brisa.html">
       <div class="prop-left">
         <div class="prop-dot" style="background:#c8a84b"></div>
-        <div>
-          <div class="prop-name">Brisa</div>
-          <div class="prop-meta">Larco 3934 · compraventa a plazos</div>
-        </div>
+        <div><div class="prop-name">Brisa</div><div class="prop-meta">Larco 3934 · compraventa a plazos</div></div>
       </div>
-      <div class="prop-right">
-        <span class="prop-badge badge-active">activo</span>
-        <span class="prop-arrow">→</span>
-      </div>
+      <div class="prop-right"><span class="badge badge-active">activo</span><span class="prop-arrow">→</span></div>
     </a>
 
     <div class="prop-card inactive">
       <div class="prop-left">
-        <div class="prop-dot" style="background:#9a9a94"></div>
-        <div>
-          <div class="prop-name">Ede</div>
-          <div class="prop-meta">próximamente</div>
-        </div>
+        <div class="prop-dot" style="background:#8a826e"></div>
+        <div><div class="prop-name">Ede</div><div class="prop-meta">próximamente</div></div>
       </div>
-      <div class="prop-right">
-        <span class="prop-badge badge-soon">próximo</span>
-      </div>
+      <div class="prop-right"><span class="badge badge-soon">próximo</span></div>
     </div>
-
   </div>
-
-  <hr class="divider">
 
   <div class="footer">
-    <strong>Varguitas</strong> · sistema de gestión de rentas de 3934<br>
-    Administrado por @nvu<br>
+    <div class="footer-brand">Paisita · 3934</div>
+    <div class="footer-note">Hecho en Lima, Perú · @nico.nvu</div>
   </div>
-
 </div>
 
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script>
 const CLIENT_ID = '779240650302-q68dttktik0dsp08smf8j365gu3gkb3g.apps.googleusercontent.com';
-const SCOPES    = 'openid email profile';
 let tokenClient = null;
 
 window.onload = () => {
@@ -167,7 +454,7 @@ window.onload = () => {
       clearInterval(iv);
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
-        scope: SCOPES,
+        scope: 'openid email profile',
         callback: onToken,
       });
     }
@@ -184,10 +471,10 @@ function onToken(resp) {
   fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
     headers: { Authorization: `Bearer ${resp.access_token}` }
   }).then(r => r.json()).then(info => {
-    const badge = document.getElementById('userBadge');
-    if (badge) badge.textContent = '● ' + (info.email || 'conectado');
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('userBadge').textContent = '● ' + (info.email || 'conectado');
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('navLoginBtn').style.display = 'none';
   }).catch(() => {});
 }
 </script>

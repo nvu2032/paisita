@@ -53,10 +53,11 @@ body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
 .progress-track{height:10px;background:var(--surface2);border-radius:5px;margin-bottom:8px;position:relative;overflow:visible;}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:5px;transition:width .6s ease;position:relative;}
 .progress-fill::after{content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:14px;height:14px;background:var(--gold-light);border-radius:50%;border:2px solid var(--bg);}
-.milestone-marker{position:absolute;top:-4px;width:2px;height:18px;background:var(--green);border-radius:1px;}
-.milestone-label{position:absolute;top:20px;font-size:10px;color:var(--green);font-family:var(--mono);white-space:nowrap;transform:translateX(-50%);}
-
-.progress-sub{font-size:12px;color:var(--text3);font-family:var(--mono);}
+.milestone-marker{position:absolute;top:0;width:2px;height:100%;background:var(--green);border-radius:1px;opacity:.6;}
+.progress-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.progress-sub{font-size:11px;color:var(--text3);font-family:var(--mono);}
+.milestone-tag{font-size:11px;color:var(--green);font-family:var(--mono);display:flex;align-items:center;gap:5px;}
+.milestone-tag::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;opacity:.7;}
 
 /* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px;}
@@ -164,11 +165,12 @@ body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
     </div>
     <div class="progress-track" id="progressTrack">
       <div class="progress-fill" id="progressFill" style="width:0%"></div>
-      <div class="milestone-marker" style="left:50%">
-        <div class="milestone-label">50% · Jul 2029</div>
-      </div>
+      <div class="milestone-marker" style="left:50%"></div>
     </div>
-    <div class="progress-sub" id="progressSub"></div>
+    <div class="progress-footer">
+      <div class="progress-sub" id="progressSub"></div>
+      <div class="milestone-tag">hito 50% · jul 2029</div>
+    </div>
   </div>
 
   <div class="metrics" id="metrics"></div>
@@ -284,13 +286,24 @@ async function loadAll() {
 
     // Parse plan
     const planRows = planResp.values || [];
-    PLAN = planRows.slice(1).map(r => ({
-      key:       r[0] || '',
-      nombre:    r[1] || '',
-      cuota:     parseFloat(r[2]) || 0,
-      fecha_venc:r[3] != null ? String(r[3]) : '',
-      tipo:      r[4] || 'regular',
-    })).filter(r => r.key);
+    PLAN = planRows.slice(1).map(r => {
+      const key = r[0] || '';
+      const [y, m] = key.split('-');
+      const defaultFecha = key === '2025-12' ? '30/12/2025' : `05/${m}/${y}`;
+      // Handle fecha_venc: text string OR Google Sheets date serial number
+      let fecha_venc = defaultFecha;
+      if (r[3] != null && r[3] !== '') {
+        const v = r[3];
+        if (typeof v === 'number') {
+          // Convert Google Sheets serial (days since 30/12/1899)
+          const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+          fecha_venc = `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
+        } else {
+          fecha_venc = String(v);
+        }
+      }
+      return { key, nombre: r[1]||'', cuota: parseFloat(r[2])||0, fecha_venc, tipo: r[4]||'regular' };
+    }).filter(r => r.key);
 
     // Parse pagos
     const pagosRows = pagosResp.values || [];

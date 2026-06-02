@@ -6,13 +6,22 @@
 <title>3934 · Brisa — Plan de Pagos</title>
 <style>
 :root {
-  --bg:#0f0e0c;--surface:#1a1916;--surface2:#222118;--border:#2e2c24;--border2:#3a3830;
-  --text:#f0ede4;--text2:#a09a8c;--text3:#5a5648;
-  --gold:#c8a84b;--gold-light:#e8c86c;--gold-bg:#1e1a0c;
-  --green:#2db67c;--green-bg:#0a2018;
-  --red:#e05555;--red-bg:#200e0e;
+  --bg:#fafaf8;--surface:#ffffff;--surface2:#f4f3ef;--border:#e2e1da;--border2:#d0cfc8;
+  --text:#1a1a18;--text2:#5a5a56;--text3:#9a9a94;
+  --gold:#b8922a;--gold-light:#c8a84b;--gold-bg:#fdf8ec;--gold-border:#d4aa55;
+  --green:#1a7a4a;--green-bg:#e1f5ee;
+  --red:#c0392b;--red-bg:#fcebeb;
   --mono:'Courier New',Courier,monospace;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#161614;--surface:#1e1e1c;--surface2:#252522;--border:#2e2e2a;--border2:#3a3a36;
+    --text:#f0efe8;--text2:#9a9a92;--text3:#5a5a54;
+    --gold:#d4a84b;--gold-light:#e8c86c;--gold-bg:#2a2310;--gold-border:#c8a84b;
+    --green:#2db67c;--green-bg:#04342c;
+    --red:#e05555;--red-bg:#501313;
+  }
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;}
@@ -138,7 +147,7 @@ body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
   <div class="header">
     <div class="eyebrow">3934 family office · brisa</div>
     <div class="title">Larco 3934 — Plan de Pagos</div>
-    <div class="subtitle">Delia Brissa Lazo Cano · S/ 1,100,000 · Dic 2025 → Abr 2033</div>
+    <div class="subtitle" id="appSubtitle">Cargando...</div>
     <div class="user-badge" id="userBadge"></div>
   </div>
 
@@ -151,7 +160,7 @@ body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
         <div class="progress-amount" id="heroAmount">S/ 0</div>
         <div class="progress-pct" id="heroPct">0% amortizado</div>
       </div>
-      <div class="progress-total">de S/ 1,100,000</div>
+      <div class="progress-total" id="progressTotal">de S/ —</div>
     </div>
     <div class="progress-track" id="progressTrack">
       <div class="progress-fill" id="progressFill" style="width:0%"></div>
@@ -195,51 +204,19 @@ body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
 
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script>
-const CLIENT_ID   = '779240650302-q68dttktik0dsp08smf8j365gu3gkb3g.apps.googleusercontent.com';
-const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets';
-const TOTAL_PRICE = 1100000;
-const MILESTONE50 = 550000; // 50% → rent drops Jul 2029
+const CLIENT_ID = '779240650302-q68dttktik0dsp08smf8j365gu3gkb3g.apps.googleusercontent.com';
+const SCOPES    = 'https://www.googleapis.com/auth/spreadsheets';
+const SHEET_ID  = '1QdLqzdm6H4Ivm-C63TXGURm4O9pntEls7GFP_rbhjWw';
 
-// Sheet — fill in after creating
-let SHEET_ID   = '1QdLqzdm6H4Ivm-C63TXGURm4O9pntEls7GFP_rbhjWw';
-let SHEET_NAME = 'Brisa';
+// Loaded from Sheet
+let PLAN        = [];
+let TOTAL_PRICE = 0;
+let MILESTONE50 = 0;
+let CFG         = {}; // all config fields
 
-const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Setiembre','Octubre','Noviembre','Diciembre'];
-const REFUERZO  = [2, 7, 12]; // Feb, Jul, Dic
-
-// ── PAYMENT PLAN GENERATOR ────────────────────────────────────────────────────
-
-function generatePlan() {
-  const plan = [];
-  // Dec 2025 — special first payment
-  plan.push({ key:'2025-12', nombre:'Diciembre 2025', cuota:10000, fecha_venc:'30/12/2025' });
-  let y = 2026, m = 1;
-  while (!(y === 2033 && m > 4)) {
-    const isRefuerzo = REFUERZO.includes(m);
-    const key = `${y}-${String(m).padStart(2,'0')}`;
-    plan.push({ key, nombre:`${MONTHS_ES[m-1]} ${y}`, cuota: isRefuerzo ? 20000 : 10000,
-                fecha_venc:`05/${String(m).padStart(2,'0')}/${y}` });
-    m++; if (m > 12) { m = 1; y++; }
-  }
-  return plan;
-}
-
-const PLAN = generatePlan();
-
-// Known payments pre-seeded
-const SEED_PAYMENTS = {
-  '2025-12': { pagado:true, cuota_pagada:10000, fecha_pago:'30/12/2025', notas:'' },
-  '2026-01': { pagado:true, cuota_pagada:10000, fecha_pago:'05/01/2026', notas:'' },
-  '2026-02': { pagado:true, cuota_pagada:20000, fecha_pago:'05/02/2026', notas:'' },
-  '2026-03': { pagado:true, cuota_pagada:10000, fecha_pago:'05/03/2026', notas:'' },
-  '2026-04': { pagado:true, cuota_pagada:10000, fecha_pago:'05/04/2026', notas:'' },
-  '2026-05': { pagado:true, cuota_pagada:10000, fecha_pago:'05/05/2026', notas:'' },
-};
-
-// State
-let accessToken = null;
-let tokenClient = null;
-let payments    = {}; // key → { pagado, cuota_pagada, fecha_pago, notas }
+let accessToken     = null;
+let tokenClient     = null;
+let payments        = {};
 let showFullHistory = false;
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -253,8 +230,6 @@ window.onload = () => {
       });
     }
   }, 100);
-  // Load seed into memory
-  payments = JSON.parse(JSON.stringify(SEED_PAYMENTS));
 };
 
 function signIn() {
@@ -272,12 +247,10 @@ function onToken(resp) {
     }).catch(()=>{});
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appContainer').style.display = 'block';
-  if (SHEET_ID) loadFromSheet(); else render();
+  loadAll();
 }
 
-// ── SHEETS (optional — works without too) ─────────────────────────────────────
-
-function setSheet(id) { SHEET_ID = id; }
+// ── SHEETS API ────────────────────────────────────────────────────────────────
 
 async function sheetsGet(range) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?valueRenderOption=UNFORMATTED_VALUE`;
@@ -292,41 +265,57 @@ async function sheetsSet(range, values) {
     body: JSON.stringify({ values }) });
 }
 
-async function loadFromSheet() {
+// ── LOAD ALL ──────────────────────────────────────────────────────────────────
+
+async function loadAll() {
   showLoading(true);
   try {
-    const resp = await sheetsGet(`A1:E200`);
-    const rows = resp.values || [];
-    if (rows.length <= 1) {
-      // Sheet empty — write header + seed payments
-      await sheetsSet('A1:E1', [['mes_key','pagado','cuota_pagada','fecha_pago','notas']]);
-      for (const key of Object.keys(SEED_PAYMENTS)) {
-        const p = SEED_PAYMENTS[key];
-        const rowNum = PLAN.findIndex(x=>x.key===key) + 2;
-        await sheetsSet(`A${rowNum}:E${rowNum}`, [[key, p.pagado, p.cuota_pagada, p.fecha_pago, p.notas]]);
-      }
-    } else {
-      for (let i=1; i<rows.length; i++) {
-        const [key, pagado, cuota_pagada, fecha_pago, notas] = rows[i];
-        if (key) payments[key] = {
-          pagado: pagado === true || pagado === 'TRUE',
-          cuota_pagada: parseFloat(cuota_pagada)||0,
-          fecha_pago: fecha_pago||'',
-          notas: notas||''
-        };
-      }
-    }
+    const [cfgResp, planResp, pagosResp] = await Promise.all([
+      sheetsGet("'config'!A1:B30"),
+      sheetsGet("'plan'!A1:E200"),
+      sheetsGet("'pagos'!A1:E200"),
+    ]);
+
+    // Parse config
+    const cfgRows = cfgResp.values || [];
+    cfgRows.forEach(([k, v]) => { if (k) CFG[k] = v; });
+    TOTAL_PRICE = parseFloat(CFG.precio_total) || 1100000;
+    MILESTONE50 = parseFloat(CFG.milestone50)  || 550000;
+
+    // Parse plan
+    const planRows = planResp.values || [];
+    PLAN = planRows.slice(1).map(r => ({
+      key:       r[0] || '',
+      nombre:    r[1] || '',
+      cuota:     parseFloat(r[2]) || 0,
+      fecha_venc:r[3] || '',
+      tipo:      r[4] || 'regular',
+    })).filter(r => r.key);
+
+    // Parse pagos
+    const pagosRows = pagosResp.values || [];
+    pagosRows.slice(1).forEach(([key, pagado, cuota_pagada, fecha_pago, notas]) => {
+      if (key) payments[key] = {
+        pagado:       pagado === true || pagado === 'TRUE',
+        cuota_pagada: parseFloat(cuota_pagada) || 0,
+        fecha_pago:   fecha_pago || '',
+        notas:        notas || '',
+      };
+    });
+
     render();
-  } catch(e) { render(); }
+  } catch(e) {
+    showError('Error cargando datos: ' + e.message);
+  }
   showLoading(false);
 }
 
 async function savePayment(key) {
-  if (!SHEET_ID || !accessToken) return;
+  if (!accessToken) return;
   const p = payments[key];
-  const rowNum = PLAN.findIndex(x=>x.key===key) + 2; // +2 for header
+  const rowNum = PLAN.findIndex(x => x.key === key) + 2;
   try {
-    await sheetsSet(`A${rowNum}:E${rowNum}`, [[key, p.pagado, p.cuota_pagada, p.fecha_pago, p.notas]]);
+    await sheetsSet(`'pagos'!A${rowNum}:E${rowNum}`, [[key, p.pagado, p.cuota_pagada, p.fecha_pago, p.notas]]);
   } catch(e) {}
 }
 
@@ -347,8 +336,8 @@ function getStats() {
     }
   }
 
-  const pct = (totalPaid / TOTAL_PRICE * 100);
-  const milestone50pct = (totalPaid / MILESTONE50 * 100);
+  const pct = TOTAL_PRICE ? (totalPaid / TOTAL_PRICE * 100) : 0;
+  const milestone50pct = MILESTONE50 ? (totalPaid / MILESTONE50 * 100) : 0;
   const remaining = TOTAL_PRICE - totalPaid;
 
   // Find next unpaid
@@ -382,6 +371,13 @@ function fmt(n) { return 'S/ ' + Number(n).toLocaleString('es-PE', {minimumFract
 
 function render() {
   const s = getStats();
+  if (!PLAN.length) return;
+
+  // Update dynamic subtitle and totals
+  const sub = document.getElementById('appSubtitle');
+  if (sub) sub.textContent = `${CFG.compradora||'Compradora'} · ${fmt(TOTAL_PRICE)} · Dic 2025 → Abr 2033`;
+  const pt = document.getElementById('progressTotal');
+  if (pt) pt.textContent = `de ${fmt(TOTAL_PRICE)}`;
 
   // Progress hero
   document.getElementById('heroAmount').textContent = fmt(s.totalPaid);
@@ -420,8 +416,8 @@ function render() {
   document.getElementById('milestoneCard').innerHTML = `
     <div class="milestone-card-title">🎯 Próximo hito — Julio 2029</div>
     <div class="milestone-card-body">
-      Cuando amortices <strong>S/ 550,000 (50%)</strong>, tu merced conductiva baja de
-      <strong>S/ 2,600</strong> a <strong>S/ 800</strong> por mes.
+      Cuando amortices <strong>S/ ${Number(MILESTONE50).toLocaleString()} (50%)</strong>, tu merced conductiva baja de
+      <strong>S/ ${Number(CFG.merced_fase1||2600).toLocaleString()}</strong> a <strong>S/ ${Number(CFG.merced_fase2||800).toLocaleString()}</strong> por mes.
       Eso son <strong>S/ ${ahorro.toLocaleString()}/mes menos</strong> — <strong>S/ ${(ahorro*12).toLocaleString()} al año</strong> que se quedan contigo.
     </div>
     <div class="milestone-progress">
@@ -522,7 +518,7 @@ function generateReport() {
   const s = getStats();
   const today = new Date();
   const mesActual = `${MONTHS_ES[today.getMonth()]} ${today.getFullYear()}`;
-  const ahorro = 2600 - 800;
+  const ahorro = (parseFloat(CFG.merced_fase1)||2600) - (parseFloat(CFG.merced_fase2)||800);
   const ownedPct = s.pct.toFixed(1);
 
   const msg = `Hola Brisa 🏠
@@ -537,7 +533,7 @@ Eso representa el *${ownedPct}%* de Larco 3934.
 —
 
 🎯 *Tu próximo gran hito: Julio 2029*
-Cuando llegues a S/ 550,000 (50%), tu merced conductiva baja de S/ 2,600 a S/ 800.
+Cuando llegues a S/ ${Number(MILESTONE50).toLocaleString()} (50%), tu merced conductiva baja de S/ ${CFG.merced_fase1||2600} a S/ ${CFG.merced_fase2||800}.
 Eso son *S/ ${ahorro.toLocaleString()}/mes menos* — S/ ${(ahorro*12).toLocaleString()} al año que se quedan en tu bolsillo.
 Vas por *${s.milestone50pct.toFixed(0)}%* del camino a ese hito.
 
@@ -669,8 +665,8 @@ function generarRecibo(key) {
   <div class="header">
     <div>
       <div class="entity-name">Administradora de Propiedades 3934</div>
-      <div class="entity-sub">Nicolás Vargas Ortiz & Rosalina Ugalde Solorzano<br>
-      Representados por: Luiggi Nicolás Vargas Ugalde · DNI 44812803</div>
+      <div class="entity-sub">${CFG.vendedor1||''} & ${CFG.vendedor2||''}<br>
+      Representados por: ${CFG.apoderado||''} · DNI ${CFG.apoderado_dni||''}</div>
     </div>
     <div class="rec-block">
       <div class="rec-num">${numRecibo}</div>
@@ -685,15 +681,15 @@ function generarRecibo(key) {
     <div class="party-grid">
       <div>
         <div style="font-size:9pt; color:#5a5a56; margin-bottom:6px;">Vendedores</div>
-        <div style="font-size:10pt; font-weight:bold;">Nicolás Vargas Ortiz</div>
-        <div style="font-size:9pt; color:#5a5a56;">DNI: 08591823</div>
-        <div style="font-size:10pt; font-weight:bold; margin-top:6px;">Rosalina Ugalde Solorzano</div>
-        <div style="font-size:9pt; color:#5a5a56;">DNI: 08591824</div>
+        <div style="font-size:10pt; font-weight:bold;">${CFG.vendedor1||''}</div>
+        <div style="font-size:9pt; color:#5a5a56;">DNI: ${CFG.vendedor1_dni||''}</div>
+        <div style="font-size:10pt; font-weight:bold; margin-top:6px;">${CFG.vendedor2||''}</div>
+        <div style="font-size:9pt; color:#5a5a56;">DNI: ${CFG.vendedor2_dni||''}</div>
       </div>
       <div>
         <div style="font-size:9pt; color:#5a5a56; margin-bottom:6px;">Compradora</div>
-        <div style="font-size:10pt; font-weight:bold;">Delia Brissa Lazo Cano</div>
-        <div style="font-size:9pt; color:#5a5a56;">DNI: 76578580</div>
+        <div style="font-size:10pt; font-weight:bold;">${CFG.compradora||''}</div>
+        <div style="font-size:9pt; color:#5a5a56;">DNI: ${CFG.compradora_dni||''}</div>
       </div>
     </div>
   </div>
@@ -701,10 +697,10 @@ function generarRecibo(key) {
   <div class="section">
     <div class="section-title">Bien inmueble</div>
     <div class="prop-box">
-      <strong>Jr. Víctor Larco Herrera 3934</strong>, Calle 8 Manzana U Lote 22<br>
+      <strong>${CFG.propiedad||""}</strong><br>
       Urbanización Panamericana Norte, Los Olivos, Lima<br>
-      Partida Electrónica N° 43941941 — Registro de Predios de Lima, SUNARP<br>
-      Precio de venta total: <strong>S/ 1,100,000.00</strong> · Contrato: 30 de diciembre de 2025
+      Partida Electrónica N° ${CFG.partida||''} — Registro de Predios de Lima, SUNARP<br>
+      Precio de venta total: <strong>${fmtNum(TOTAL_PRICE)}</strong> · Contrato: ${CFG.fecha_contrato||""}
     </div>
   </div>
 
@@ -756,7 +752,7 @@ function generarRecibo(key) {
     <div class="progress-labels">
       <span>S/ 0</span>
       <span style="color:#c8a84b">${pct}% completado</span>
-      <span>S/ 1,100,000</span>
+      <span>${fmtNum(TOTAL_PRICE)}</span>
     </div>
   </div>
 
@@ -773,14 +769,14 @@ function generarRecibo(key) {
   <div class="signatures">
     <div class="sig-block">
       <div class="sig-line">
-        <div class="sig-name">Luiggi Nicolás Vargas Ugalde</div>
+        <div class="sig-name">${CFG.apoderado||''}</div>
         <div>Apoderado de los vendedores · DNI 44812803</div>
       </div>
     </div>
     <div class="sig-block">
       <div class="sig-line">
-        <div class="sig-name">Delia Brissa Lazo Cano</div>
-        <div>Compradora · DNI 76578580</div>
+        <div class="sig-name">${CFG.compradora||''}</div>
+        <div>Compradora · DNI ${CFG.compradora_dni||''}</div>
       </div>
     </div>
   </div>
@@ -788,7 +784,7 @@ function generarRecibo(key) {
   <div class="footer-note">
     Este documento es una constancia de pago emitida en el marco del Contrato Privado de Compraventa con Reserva de Propiedad
     celebrado el 30 de diciembre de 2025. La transferencia de propiedad quedará perfeccionada una vez cancelado
-    el precio total de S/ 1,100,000.00 y levantada la hipoteca inscrita, conforme a la Cláusula Séptima del contrato.
+    el precio total de ${fmtNum(TOTAL_PRICE)} y levantada la hipoteca inscrita, conforme a la Cláusula Séptima del contrato.
     El voucher de depósito bancario constituye el único medio probatorio válido del pago, conforme a la Cláusula Tercera.
   </div>
 
@@ -921,8 +917,8 @@ function generarEstadoCuenta() {
     <div>
       <div class="entity-name">Administradora de Propiedades 3934</div>
       <div class="entity-sub">
-        Nicolás Vargas Ortiz & Rosalina Ugalde Solorzano<br>
-        Representados por: Luiggi Nicolás Vargas Ugalde · DNI 44812803
+        ${CFG.vendedor1||''} & ${CFG.vendedor2||''}<br>
+        Representados por: ${CFG.apoderado||''} · DNI ${CFG.apoderado_dni||''}
       </div>
     </div>
     <div class="doc-meta">
@@ -936,27 +932,27 @@ function generarEstadoCuenta() {
   <div class="parties">
     <div>
       <div class="party-label">Vendedores</div>
-      <div class="party-name">Nicolás Vargas Ortiz</div>
-      <div class="party-sub">DNI: 08591823</div>
-      <div class="party-name" style="margin-top:6px;">Rosalina Ugalde Solorzano</div>
-      <div class="party-sub">DNI: 08591824</div>
+      <div class="party-name">${CFG.vendedor1||''}</div>
+      <div class="party-sub">DNI: ${CFG.vendedor1_dni||''}</div>
+      <div class="party-name" style="margin-top:6px;">${CFG.vendedor2||''}</div>
+      <div class="party-sub">DNI: ${CFG.vendedor2_dni||''}</div>
     </div>
     <div>
       <div class="party-label">Compradora</div>
-      <div class="party-name">Delia Brissa Lazo Cano</div>
-      <div class="party-sub">DNI: 76578580</div>
+      <div class="party-name">${CFG.compradora||''}</div>
+      <div class="party-sub">DNI: ${CFG.compradora_dni||''}</div>
     </div>
   </div>
 
   <div class="property-box">
     <strong>Inmueble:</strong> Jr. Víctor Larco Herrera 3934, Calle 8 Mz. U Lt. 22, Urb. Panamericana Norte, Los Olivos, Lima<br>
-    <strong>Partida SUNARP:</strong> 43941941 &nbsp;·&nbsp; <strong>Precio total:</strong> S/ 1,100,000.00 &nbsp;·&nbsp; <strong>Contrato:</strong> 30 de diciembre de 2025
+    <strong>Partida SUNARP:</strong> ${CFG.partida||''} &nbsp;·&nbsp; <strong>Precio total:</strong> ${fmtNum(TOTAL_PRICE)} &nbsp;·&nbsp; <strong>Contrato:</strong> ${CFG.fecha_contrato||''}
   </div>
 
   <div class="summary-grid">
     <div class="sum-box">
       <div class="sum-label">Precio total</div>
-      <div class="sum-val">S/ 1,100,000</div>
+      <div class="sum-val">${fmtNum(TOTAL_PRICE)}</div>
     </div>
     <div class="sum-box">
       <div class="sum-label">Amortizado</div>
@@ -981,7 +977,7 @@ function generarEstadoCuenta() {
     <div class="prog-labels">
       <span>S/ 0</span>
       <span style="color:#b8922a">${pct}% completado · ${s.paidCount} de ${PLAN.length} cuotas</span>
-      <span>S/ 1,100,000</span>
+      <span>${fmtNum(TOTAL_PRICE)}</span>
     </div>
     <div class="milestone-note">
       Hito 50%: al amortizar S/ 550,000 la merced conductiva baja de S/ 2,600 a S/ 800/mes (ahorro S/ 1,800/mes).
@@ -1026,21 +1022,21 @@ function generarEstadoCuenta() {
   <div class="signatures">
     <div>
       <div class="sig-line">
-        <div class="sig-name">Luiggi Nicolás Vargas Ugalde</div>
+        <div class="sig-name">${CFG.apoderado||''}</div>
         <div style="font-size:8.5pt;color:#4a4535;">Apoderado · DNI 44812803</div>
       </div>
     </div>
     <div>
       <div class="sig-line">
-        <div class="sig-name">Delia Brissa Lazo Cano</div>
-        <div style="font-size:8.5pt;color:#4a4535;">Compradora · DNI 76578580</div>
+        <div class="sig-name">${CFG.compradora||''}</div>
+        <div style="font-size:8.5pt;color:#4a4535;">Compradora · DNI ${CFG.compradora_dni||''}</div>
       </div>
     </div>
   </div>
 
   <div class="footer-note">
     Este estado de cuenta resume el avance del Contrato Privado de Compraventa con Reserva de Propiedad celebrado el 30 de diciembre de 2025.
-    La transferencia de propiedad quedará perfeccionada al cancelar S/ 1,100,000.00 y levantar la hipoteca inscrita (Cláusula 7ª).
+    La transferencia de propiedad quedará perfeccionada al cancelar ${fmtNum(TOTAL_PRICE)} y levantar la hipoteca inscrita (Cláusula 7ª).
     El voucher de depósito bancario es el único medio probatorio válido de cada pago (Cláusula 3ª).
   </div>
 

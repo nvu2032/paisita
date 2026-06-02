@@ -288,7 +288,7 @@ async function loadAll() {
       key:       r[0] || '',
       nombre:    r[1] || '',
       cuota:     parseFloat(r[2]) || 0,
-      fecha_venc:r[3] || '',
+      fecha_venc:r[3] != null ? String(r[3]) : '',
       tipo:      r[4] || 'regular',
     })).filter(r => r.key);
 
@@ -349,7 +349,7 @@ function getStats() {
   // Days to next payment
   let daysToNext = null;
   if (nextItem) {
-    const parts = nextItem.fecha_venc.split('/');
+    const parts = String(nextItem.fecha_venc).split('/');
     const due = new Date(parts[2], parts[1]-1, parts[0]);
     daysToNext = Math.ceil((due - today) / 86400000);
   }

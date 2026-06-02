@@ -287,7 +287,8 @@ async function loadAll() {
     // Parse plan
     const planRows = planResp.values || [];
     PLAN = planRows.slice(1).map(r => {
-      const key = r[0] || '';
+      const key    = r[0] != null ? String(r[0]) : '';
+      const nombre = r[1] != null ? String(r[1]) : '';
       const [y, m] = key.split('-');
       const defaultFecha = key === '2025-12' ? '30/12/2025' : `05/${m}/${y}`;
       // Handle fecha_venc: text string OR Google Sheets date serial number
@@ -302,7 +303,7 @@ async function loadAll() {
           fecha_venc = String(v);
         }
       }
-      return { key, nombre: r[1]||'', cuota: parseFloat(r[2])||0, fecha_venc, tipo: r[4]||'regular' };
+      return { key, nombre, cuota: parseFloat(r[2])||0, fecha_venc, tipo: r[4]||'regular' };
     }).filter(r => r.key);
 
     // Parse pagos

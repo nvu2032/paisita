@@ -182,9 +182,10 @@ body{max-width:680px;margin:0 auto;padding:2rem 1.5rem 5rem;}
   <div class="report-section">
     <div class="divider"></div>
     <div class="section-header">
-      <div class="section-title">Reporte para Brisa</div>
+      <div class="section-title">Reportes</div>
       <div class="btn-row">
-        <button class="btn btn-gold" onclick="generateReport()">generar mensaje WhatsApp</button>
+        <button class="btn btn-gold" onclick="generateReport()">mensaje WhatsApp</button>
+        <button class="btn btn-green" onclick="generarEstadoCuenta()">estado de cuenta PDF</button>
         <button class="btn btn-green" id="copyReportBtn" onclick="copyReport()" style="display:none">copiar</button>
       </div>
     </div>
@@ -789,6 +790,258 @@ function generarRecibo(key) {
     celebrado el 30 de diciembre de 2025. La transferencia de propiedad quedará perfeccionada una vez cancelado
     el precio total de S/ 1,100,000.00 y levantada la hipoteca inscrita, conforme a la Cláusula Séptima del contrato.
     El voucher de depósito bancario constituye el único medio probatorio válido del pago, conforme a la Cláusula Tercera.
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+function generarEstadoCuenta() {
+  const s       = getStats();
+  const today   = new Date();
+  const fechaEmision = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+  const fmtNum  = n => 'S/ ' + Number(n).toLocaleString('es-PE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  // Build paid payments table rows
+  const paidRows = PLAN.filter(item => payments[item.key]?.pagado).map((item, idx) => {
+    const p = payments[item.key];
+    let cumul = 0;
+    for (const i of PLAN) {
+      if (payments[i.key]?.pagado) cumul += payments[i.key].cuota_pagada || i.cuota;
+      if (i.key === item.key) break;
+    }
+    const rowBg = idx % 2 === 0 ? '#ffffff' : '#f9f8f5';
+    return `<tr style="background:${rowBg}">
+      <td style="padding:7px 10px;border-bottom:0.5px solid #e8e3d6;font-size:9pt;">${String(idx+1).padStart(2,'0')}</td>
+      <td style="padding:7px 10px;border-bottom:0.5px solid #e8e3d6;font-size:9pt;">${item.nombre}</td>
+      <td style="padding:7px 10px;border-bottom:0.5px solid #e8e3d6;font-size:9pt;text-align:center;">${p.fecha_pago || '—'}</td>
+      <td style="padding:7px 10px;border-bottom:0.5px solid #e8e3d6;font-size:9pt;text-align:right;font-family:'Courier New',monospace;${item.cuota===20000?'color:#b8922a;font-weight:bold;':''}">${fmtNum(p.cuota_pagada||item.cuota)}</td>
+      <td style="padding:7px 10px;border-bottom:0.5px solid #e8e3d6;font-size:9pt;text-align:right;font-family:'Courier New',monospace;">${fmtNum(cumul)}</td>
+    </tr>`;
+  }).join('');
+
+  // Next payment
+  let nextItem = null;
+  for (const i of PLAN) { if (!payments[i.key]?.pagado) { nextItem = i; break; } }
+
+  const pct     = (s.totalPaid / TOTAL_PRICE * 100).toFixed(2);
+  const saldo   = TOTAL_PRICE - s.totalPaid;
+  const m50pct  = Math.min((s.totalPaid / MILESTONE50 * 100), 100).toFixed(1);
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Estado de Cuenta — Brisa · Larco 3934</title>
+<style>
+  @page { size: A4; margin: 1.8cm 2cm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Georgia', serif; font-size: 10pt; color: #1c1a14; background: #fff; }
+  .page { max-width: 720px; margin: 0 auto; padding: 32px; }
+
+  /* Header */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1c1a14; padding-bottom: 14px; margin-bottom: 18px; }
+  .entity-name { font-size: 14pt; font-weight: bold; letter-spacing: -.01em; }
+  .entity-sub { font-size: 8.5pt; color: #4a4535; margin-top: 3px; line-height: 1.5; }
+  .doc-meta { text-align: right; }
+  .doc-type { font-size: 9pt; letter-spacing: .06em; text-transform: uppercase; color: #8a826e; }
+  .doc-date { font-size: 8.5pt; color: #4a4535; margin-top: 4px; }
+
+  /* Title */
+  .doc-title { font-size: 13pt; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: .04em; border: 1px solid #1c1a14; padding: 9px; margin-bottom: 16px; }
+
+  /* Parties */
+  .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; padding: 12px 14px; background: #f9f8f5; border: 0.5px solid #e8e3d6; border-radius: 4px; }
+  .party-label { font-size: 8pt; letter-spacing: .08em; text-transform: uppercase; color: #8a826e; margin-bottom: 5px; }
+  .party-name { font-size: 9.5pt; font-weight: bold; color: #1c1a14; }
+  .party-sub { font-size: 8.5pt; color: #4a4535; margin-top: 2px; }
+
+  /* Property */
+  .property-box { font-size: 9pt; line-height: 1.7; padding: 10px 14px; background: #f9f8f5; border: 0.5px solid #e8e3d6; border-radius: 4px; margin-bottom: 16px; }
+
+  /* Summary boxes */
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .sum-box { border: 0.5px solid #e8e3d6; border-radius: 4px; padding: 10px 12px; text-align: center; }
+  .sum-label { font-size: 7.5pt; letter-spacing: .06em; text-transform: uppercase; color: #8a826e; margin-bottom: 5px; }
+  .sum-val { font-size: 11pt; font-weight: bold; font-family: 'Courier New', monospace; color: #1c1a14; }
+  .sum-val.green { color: #1a6b40; }
+  .sum-val.gold { color: #b8922a; }
+
+  /* Progress */
+  .progress-section { margin-bottom: 16px; }
+  .prog-label { font-size: 8pt; letter-spacing: .08em; text-transform: uppercase; color: #8a826e; margin-bottom: 6px; }
+  .prog-outer { height: 10px; background: #e8e3d6; border-radius: 5px; position: relative; margin-bottom: 4px; }
+  .prog-fill { height: 100%; background: #b8922a; border-radius: 5px; }
+  .prog-milestone { position: absolute; top: -3px; left: 50%; width: 2px; height: 16px; background: #1a6b40; }
+  .prog-labels { display: flex; justify-content: space-between; font-size: 8pt; color: #8a826e; font-family: 'Courier New', monospace; }
+  .milestone-note { font-size: 8.5pt; color: #1a6b40; margin-top: 5px; padding: 6px 10px; background: #e8f5ed; border-radius: 3px; }
+
+  /* Table */
+  .table-section { margin-bottom: 16px; }
+  .table-title { font-size: 8pt; letter-spacing: .08em; text-transform: uppercase; color: #8a826e; border-bottom: 0.5px solid #e8e3d6; padding-bottom: 5px; margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  thead { background: #1c1a14; }
+  thead th { color: #faf8f3; padding: 7px 10px; text-align: left; font-size: 8pt; letter-spacing: .04em; font-weight: normal; }
+  thead th:last-child, thead th:nth-child(4) { text-align: right; }
+
+  /* Next payment */
+  .next-box { border: 1px dashed #b8922a; border-radius: 4px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; background: #fdf8ee; }
+  .next-label { font-size: 8pt; text-transform: uppercase; letter-spacing: .06em; color: #8a826e; margin-bottom: 3px; }
+  .next-val { font-size: 13pt; font-weight: bold; font-family: 'Courier New', monospace; color: #b8922a; }
+
+  /* Signatures */
+  .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 28px; }
+  .sig-line { border-top: 1px solid #1c1a14; padding-top: 7px; margin-top: 36px; font-size: 8.5pt; text-align: center; }
+  .sig-name { font-weight: bold; font-size: 9pt; }
+
+  /* Footer */
+  .footer-note { margin-top: 16px; border-top: 0.5px solid #e8e3d6; padding-top: 10px; font-size: 7.5pt; color: #8a826e; line-height: 1.6; text-align: center; }
+
+  @media print {
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="no-print" style="text-align:right;margin-bottom:16px;">
+    <button onclick="window.print()" style="padding:8px 20px;background:#1c1a14;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">
+      Imprimir / Guardar PDF
+    </button>
+  </div>
+
+  <div class="header">
+    <div>
+      <div class="entity-name">Administradora de Propiedades 3934</div>
+      <div class="entity-sub">
+        Nicolás Vargas Ortiz & Rosalina Ugalde Solorzano<br>
+        Representados por: Luiggi Nicolás Vargas Ugalde · DNI 44812803
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-type">Estado de Cuenta</div>
+      <div class="doc-date">Emitido: ${fechaEmision}</div>
+    </div>
+  </div>
+
+  <div class="doc-title">Estado de Cuenta — Compraventa a Plazos</div>
+
+  <div class="parties">
+    <div>
+      <div class="party-label">Vendedores</div>
+      <div class="party-name">Nicolás Vargas Ortiz</div>
+      <div class="party-sub">DNI: 08591823</div>
+      <div class="party-name" style="margin-top:6px;">Rosalina Ugalde Solorzano</div>
+      <div class="party-sub">DNI: 08591824</div>
+    </div>
+    <div>
+      <div class="party-label">Compradora</div>
+      <div class="party-name">Delia Brissa Lazo Cano</div>
+      <div class="party-sub">DNI: 76578580</div>
+    </div>
+  </div>
+
+  <div class="property-box">
+    <strong>Inmueble:</strong> Jr. Víctor Larco Herrera 3934, Calle 8 Mz. U Lt. 22, Urb. Panamericana Norte, Los Olivos, Lima<br>
+    <strong>Partida SUNARP:</strong> 43941941 &nbsp;·&nbsp; <strong>Precio total:</strong> S/ 1,100,000.00 &nbsp;·&nbsp; <strong>Contrato:</strong> 30 de diciembre de 2025
+  </div>
+
+  <div class="summary-grid">
+    <div class="sum-box">
+      <div class="sum-label">Precio total</div>
+      <div class="sum-val">S/ 1,100,000</div>
+    </div>
+    <div class="sum-box">
+      <div class="sum-label">Amortizado</div>
+      <div class="sum-val green">${fmtNum(s.totalPaid)}</div>
+    </div>
+    <div class="sum-box">
+      <div class="sum-label">Pendiente</div>
+      <div class="sum-val gold">${fmtNum(saldo)}</div>
+    </div>
+    <div class="sum-box">
+      <div class="sum-label">Avance</div>
+      <div class="sum-val">${pct}%</div>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="prog-label">Progreso del contrato</div>
+    <div class="prog-outer">
+      <div class="prog-fill" style="width:${Math.min(parseFloat(pct),100)}%"></div>
+      <div class="prog-milestone" title="50% — Jul 2029"></div>
+    </div>
+    <div class="prog-labels">
+      <span>S/ 0</span>
+      <span style="color:#b8922a">${pct}% completado · ${s.paidCount} de ${PLAN.length} cuotas</span>
+      <span>S/ 1,100,000</span>
+    </div>
+    <div class="milestone-note">
+      Hito 50%: al amortizar S/ 550,000 la merced conductiva baja de S/ 2,600 a S/ 800/mes (ahorro S/ 1,800/mes).
+      Avance hacia ese hito: <strong>${m50pct}%</strong> — estimado <strong>julio 2029</strong>.
+    </div>
+  </div>
+
+  <div class="table-section">
+    <div class="table-title" style="margin-bottom:0;">Historial de pagos</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30px">#</th>
+          <th>Período</th>
+          <th>Fecha de pago</th>
+          <th>Cuota</th>
+          <th>Acumulado</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${paidRows}
+      </tbody>
+      <tfoot>
+        <tr style="background:#f9f8f5;">
+          <td colspan="3" style="padding:8px 10px;font-size:9pt;font-weight:bold;border-top:1px solid #1c1a14;">Total amortizado</td>
+          <td style="padding:8px 10px;text-align:right;font-family:'Courier New',monospace;font-weight:bold;font-size:9pt;border-top:1px solid #1c1a14;">${fmtNum(s.totalPaid)}</td>
+          <td style="padding:8px 10px;border-top:1px solid #1c1a14;"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  ${nextItem ? `
+  <div class="next-box">
+    <div>
+      <div class="next-label">Próxima cuota</div>
+      <div style="font-size:10pt;color:#4a4535;">${nextItem.nombre} &nbsp;·&nbsp; Vence: ${nextItem.fecha_venc}</div>
+    </div>
+    <div class="next-val">${fmtNum(nextItem.cuota)}</div>
+  </div>` : ''}
+
+  <div class="signatures">
+    <div>
+      <div class="sig-line">
+        <div class="sig-name">Luiggi Nicolás Vargas Ugalde</div>
+        <div style="font-size:8.5pt;color:#4a4535;">Apoderado · DNI 44812803</div>
+      </div>
+    </div>
+    <div>
+      <div class="sig-line">
+        <div class="sig-name">Delia Brissa Lazo Cano</div>
+        <div style="font-size:8.5pt;color:#4a4535;">Compradora · DNI 76578580</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Este estado de cuenta resume el avance del Contrato Privado de Compraventa con Reserva de Propiedad celebrado el 30 de diciembre de 2025.
+    La transferencia de propiedad quedará perfeccionada al cancelar S/ 1,100,000.00 y levantar la hipoteca inscrita (Cláusula 7ª).
+    El voucher de depósito bancario es el único medio probatorio válido de cada pago (Cláusula 3ª).
   </div>
 
 </div>
